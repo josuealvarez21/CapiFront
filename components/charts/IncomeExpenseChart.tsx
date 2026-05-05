@@ -58,7 +58,7 @@ export default function IncomeExpenseChart({ summary }: IncomeExpenseChartProps)
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: any) => formatCurrency(Number(value))}
+                  formatter={(value: unknown) => formatCurrency(Number(value))}
                   contentStyle={{
                     backgroundColor: '#121212',
                     borderColor: '#2e2e2e',
@@ -72,16 +72,16 @@ export default function IncomeExpenseChart({ summary }: IncomeExpenseChartProps)
             </ResponsiveContainer>
           </div>
 
-          <div className="flex justify-center gap-6 mt-4">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-4">
             <div className="flex items-center gap-2 bg-[#1C542D] bg-opacity-20 px-4 py-2 rounded-full border border-green-900">
               <div className="w-4 h-4 rounded-full bg-[#22c55e]" />
-              <span className="text-sm font-bold text-green-400">
+              <span className="text-xs sm:text-sm font-bold text-green-400">
                 Ingresos: {((ingresos / total) * 100).toFixed(1)}%
               </span>
             </div>
             <div className="flex items-center gap-2 bg-[#451a1a] bg-opacity-20 px-4 py-2 rounded-full border border-red-900">
               <div className="w-4 h-4 rounded-full bg-[#ef4444]" />
-              <span className="text-sm font-bold text-red-400">
+              <span className="text-xs sm:text-sm font-bold text-red-400">
                 Gastos: {((gastos / total) * 100).toFixed(1)}%
               </span>
             </div>

@@ -22,11 +22,17 @@ interface SavingsPlannerProps {
 }
 
 export default function SavingsPlanner({
-  data, token,
-  savingsPercentage, setSavingsPercentage,
-  savingsDistributionMode, setSavingsDistributionMode,
-  manualSavingsAmount, setManualSavingsAmount,
-  showSuccessFeedback, showFeedback, fetchData,
+  data,
+  token,
+  savingsPercentage,
+  setSavingsPercentage,
+  savingsDistributionMode,
+  setSavingsDistributionMode,
+  manualSavingsAmount,
+  setManualSavingsAmount,
+  showSuccessFeedback,
+  showFeedback,
+  fetchData,
 }: SavingsPlannerProps) {
   const totalToDistribute = manualSavingsAmount
     ? Number(manualSavingsAmount)
@@ -36,10 +42,16 @@ export default function SavingsPlanner({
     if (totalToDistribute <= 0) return;
 
     const allocations = calculateSavingsDistribution(
-      totalToDistribute, data.metas, savingsDistributionMode
+      totalToDistribute,
+      data.metas,
+      savingsDistributionMode,
     );
 
-    if (confirm(`¿Confirmas la distribución de ${formatCurrency(totalToDistribute)} en ${allocations.length} metas?`)) {
+    if (
+      confirm(
+        `¿Confirmas la distribución de ${formatCurrency(totalToDistribute)} en ${allocations.length} metas?`,
+      )
+    ) {
       try {
         await api.goals.bulkAllocate(token, allocations);
         showFeedback('¡Inversión exitosa! Tus metas están más cerca.');
@@ -60,7 +72,8 @@ export default function SavingsPlanner({
             <Target className="text-[#f59e0b]" /> Planificador de Inversión
           </h3>
           <p className="text-gray-400 mb-6">
-            Optimiza cómo crece tu dinero. Elige un porcentaje o un monto exacto y decide cómo distribuirlo entre tus metas.
+            Optimiza cómo crece tu dinero. Elige un porcentaje o un monto exacto y decide cómo
+            distribuirlo entre tus metas.
           </p>
 
           <div className="flex gap-2 p-1 bg-[#121212] rounded-xl border border-[#2e2e2e] mb-4">
@@ -88,26 +101,37 @@ export default function SavingsPlanner({
           <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
             <div className="flex-1">
               <div className="flex justify-between mb-2">
-                <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Porcentaje de Balance</span>
+                <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">
+                  Porcentaje de Balance
+                </span>
                 <span className="text-[#f59e0b] font-extrabold">{savingsPercentage}%</span>
               </div>
               <input
                 type="range"
-                min="0" max="100"
+                min="0"
+                max="100"
                 value={savingsPercentage}
-                onChange={(e) => { setSavingsPercentage(parseInt(e.target.value)); setManualSavingsAmount(''); }}
+                onChange={(e) => {
+                  setSavingsPercentage(parseInt(e.target.value));
+                  setManualSavingsAmount('');
+                }}
                 className="w-full h-1.5 bg-[#1e1e1e] rounded-lg appearance-none cursor-pointer accent-[#f59e0b]"
               />
             </div>
             <div className="w-full sm:w-48">
               <div className="flex justify-between mb-2">
-                <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">O monto exacto</span>
+                <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">
+                  O monto exacto
+                </span>
               </div>
               <input
                 type="number"
                 placeholder="Monto $"
                 value={manualSavingsAmount}
-                onChange={(e) => { setManualSavingsAmount(e.target.value); setSavingsPercentage(0); }}
+                onChange={(e) => {
+                  setManualSavingsAmount(e.target.value);
+                  setSavingsPercentage(0);
+                }}
                 className="w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#f59e0b]"
               />
             </div>
@@ -115,12 +139,20 @@ export default function SavingsPlanner({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-[#1e1e1e] p-4 rounded-xl border border-[#2e2e2e]">
-              <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Balance Disponible</p>
-              <p className="text-md font-bold text-white">{formatCurrency(data.summary.balance_total)}</p>
+              <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">
+                Balance Disponible
+              </p>
+              <p className="text-md font-bold text-white">
+                {formatCurrency(data.summary.balance_total)}
+              </p>
             </div>
             <div className="bg-[#1e1e1e] p-4 rounded-xl border border-[#f59e0b] bg-opacity-10">
-              <p className="text-[10px] text-[#f59e0b] uppercase font-bold mb-1">Total a Invertir</p>
-              <p className="text-md font-bold text-[#f59e0b]">{formatCurrency(totalToDistribute)}</p>
+              <p className="text-[10px] text-[#f59e0b] uppercase font-bold mb-1">
+                Total a Invertir
+              </p>
+              <p className="text-md font-bold text-[#f59e0b]">
+                {formatCurrency(totalToDistribute)}
+              </p>
             </div>
             <button
               onClick={handleExecutePlan}

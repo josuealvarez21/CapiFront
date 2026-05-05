@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Utensils, Home as HomeIcon, Car, Zap, TrendingUp, ShoppingCart,
-} from 'lucide-react';
+import { Utensils, Home as HomeIcon, Car, Zap, TrendingUp, ShoppingCart } from 'lucide-react';
 
 /**
  * Format a number as Colombian Peso currency.

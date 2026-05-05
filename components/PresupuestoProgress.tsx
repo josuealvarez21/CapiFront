@@ -18,18 +18,31 @@ export default function PresupuestoProgress({ presupuesto, onDelete }: Presupues
   const montoDiferencia = Math.abs(limite - gastado);
 
   return (
-    <div className={`mb-4 bg-[#121212] p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden group ${esExcedido ? 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.15)]' : 'border-[#2e2e2e] hover:border-[#8b5cf6]'}`}>
+    <div
+      className={`mb-4 bg-[#121212] p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden group ${esExcedido ? 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.15)]' : 'border-[#2e2e2e] hover:border-[#8b5cf6]'}`}
+    >
       <div className="flex justify-between mb-4 relative z-10">
         <div className="flex flex-col">
           <span className="text-white font-bold tracking-wide flex items-center gap-2">
             {presupuesto.categoria}
-            {esExcedido && <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full animate-pulse">EXCEDIDO</span>}
+            {esExcedido && (
+              <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full animate-pulse">
+                EXCEDIDO
+              </span>
+            )}
           </span>
-          <p className={`text-[11px] mt-1 ${esExcedido ? 'text-red-400 font-bold' : 'text-gray-500'}`}>
-            {esExcedido ? `¡Te has pasado por ${formatCurrency(montoDiferencia)}!` : `Te quedan ${formatCurrency(montoDiferencia)} disponibles`}
+          <p
+            className={`text-[11px] mt-1 ${esExcedido ? 'text-red-400 font-bold' : 'text-gray-500'}`}
+          >
+            {esExcedido
+              ? `¡Te has pasado por ${formatCurrency(montoDiferencia)}!`
+              : `Te quedan ${formatCurrency(montoDiferencia)} disponibles`}
           </p>
         </div>
-        <button onClick={() => onDelete(presupuesto.id)} className="text-gray-600 hover:text-red-500 transition-colors p-1">
+        <button
+          onClick={() => onDelete(presupuesto.id)}
+          className="text-gray-600 hover:text-red-500 transition-colors p-1"
+        >
           <Trash2 size={18} />
         </button>
       </div>
@@ -47,7 +60,9 @@ export default function PresupuestoProgress({ presupuesto, onDelete }: Presupues
         />
       </div>
       <div className="mt-3 flex justify-between items-center relative z-10">
-        <span className={`text-[10px] font-black uppercase tracking-widest ${esExcedido ? 'text-red-500' : 'text-[#8b5cf6]'}`}>
+        <span
+          className={`text-[10px] font-black uppercase tracking-widest ${esExcedido ? 'text-red-500' : 'text-[#8b5cf6]'}`}
+        >
           {porcentaje.toFixed(1)}% Consumido
         </span>
         {esExcedido && <TrendingUp size={14} className="text-red-500" />}

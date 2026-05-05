@@ -6,7 +6,10 @@ import { useAuth } from '@/context/AuthContext';
 import { api, UnauthorizedError } from '@/lib/api';
 import { getTodayISO, getCurrentMonthISO } from '@/lib/utils';
 import type {
-  DashboardData, CategoriaBackend, TabType, ModalMovementType,
+  DashboardData,
+  CategoriaBackend,
+  TabType,
+  ModalMovementType,
   SavingsDistributionMode,
 } from '@/lib/types';
 
@@ -38,22 +41,30 @@ export function useDashboard() {
 
   // Movement form
   const [formData, setFormData] = useState({
-    monto: '', descripcion: '', id_categoria: '', fecha: getTodayISO(),
+    monto: '',
+    descripcion: '',
+    id_categoria: '',
+    fecha: getTodayISO(),
   });
 
   // Goal form
   const [goalFormData, setGoalFormData] = useState({
-    nombre: '', objetivo: '', fecha: getTodayISO(),
+    nombre: '',
+    objetivo: '',
+    fecha: getTodayISO(),
   });
 
   // Budget form
   const [budgetFormData, setBudgetFormData] = useState({
-    id_categoria: '', limite: '', fecha_mes: getCurrentMonthISO(),
+    id_categoria: '',
+    limite: '',
+    fecha_mes: getCurrentMonthISO(),
   });
 
   // Savings planner
   const [savingsPercentage, setSavingsPercentage] = useState(10);
-  const [savingsDistributionMode, setSavingsDistributionMode] = useState<SavingsDistributionMode>('equitativa');
+  const [savingsDistributionMode, setSavingsDistributionMode] =
+    useState<SavingsDistributionMode>('equitativa');
   const [manualSavingsAmount, setManualSavingsAmount] = useState('');
   const [showSuccessFeedback, setShowSuccessFeedback] = useState<string | null>(null);
 
@@ -65,13 +76,16 @@ export function useDashboard() {
   }, [token, authLoading, router]);
 
   // --- Data fetching ---
-  const handleApiError = useCallback((error: unknown) => {
-    if (error instanceof UnauthorizedError) {
-      logout();
-    } else {
-      console.warn(error);
-    }
-  }, [logout]);
+  const handleApiError = useCallback(
+    (error: unknown) => {
+      if (error instanceof UnauthorizedError) {
+        logout();
+      } else {
+        console.warn(error);
+      }
+    },
+    [logout],
+  );
 
   const fetchData = useCallback(async () => {
     if (!token) return;
@@ -128,8 +142,11 @@ export function useDashboard() {
       setIsModalOpen(false);
       setFormData({ monto: '', descripcion: '', id_categoria: '', fecha: getTodayISO() });
       await fetchData();
-    } catch (error) { handleApiError(error); }
-    finally { setIsSubmitting(false); }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleAddGoal = async (e: React.FormEvent) => {
@@ -146,8 +163,11 @@ export function useDashboard() {
       setIsGoalModalOpen(false);
       setGoalFormData({ nombre: '', objetivo: '', fecha: getTodayISO() });
       await fetchData();
-    } catch (error) { handleApiError(error); }
-    finally { setIsSubmitting(false); }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleAddBudget = async (e: React.FormEvent) => {
@@ -165,8 +185,11 @@ export function useDashboard() {
       setIsBudgetModalOpen(false);
       setBudgetFormData({ id_categoria: '', limite: '', fecha_mes: getCurrentMonthISO() });
       await fetchData();
-    } catch (error) { handleApiError(error); }
-    finally { setIsSubmitting(false); }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -186,8 +209,11 @@ export function useDashboard() {
       setProfilePicFile(null);
       setProfilePicUrl('');
       await fetchData();
-    } catch (error) { handleApiError(error); }
-    finally { setIsUploadingProfilePic(false); }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setIsUploadingProfilePic(false);
+    }
   };
 
   const handleDeleteMovement = async (id: string) => {
@@ -195,7 +221,9 @@ export function useDashboard() {
     try {
       await api.movements.delete(token, id);
       await fetchData();
-    } catch (error) { handleApiError(error); }
+    } catch (error) {
+      handleApiError(error);
+    }
   };
 
   const handleDeleteGoal = async (id: string) => {
@@ -203,7 +231,9 @@ export function useDashboard() {
     try {
       await api.goals.delete(token, id);
       await fetchData();
-    } catch (error) { handleApiError(error); }
+    } catch (error) {
+      handleApiError(error);
+    }
   };
 
   const handleDeleteBudget = async (id: string) => {
@@ -211,7 +241,9 @@ export function useDashboard() {
     try {
       await api.budgets.delete(token, id);
       await fetchData();
-    } catch (error) { handleApiError(error); }
+    } catch (error) {
+      handleApiError(error);
+    }
   };
 
   const showFeedback = (message: string) => {
@@ -221,36 +253,60 @@ export function useDashboard() {
 
   return {
     // Auth state
-    token, authLoading, logout,
+    token,
+    authLoading,
+    logout,
     // Core data
-    data, loading, categories,
+    data,
+    loading,
+    categories,
     // Navigation
-    currentTab, setCurrentTab,
+    currentTab,
+    setCurrentTab,
     // Modals
-    isModalOpen, setIsModalOpen, modalType,
-    isGoalModalOpen, setIsGoalModalOpen,
-    isBudgetModalOpen, setIsBudgetModalOpen,
-    isSettingsModalOpen, setIsSettingsModalOpen,
+    isModalOpen,
+    setIsModalOpen,
+    modalType,
+    isGoalModalOpen,
+    setIsGoalModalOpen,
+    isBudgetModalOpen,
+    setIsBudgetModalOpen,
+    isSettingsModalOpen,
+    setIsSettingsModalOpen,
     isSubmitting,
     // Actions
     openMovementModal,
-    handleAddMovement, handleAddGoal, handleAddBudget,
+    handleAddMovement,
+    handleAddGoal,
+    handleAddBudget,
     handleUpdateProfile,
-    handleDeleteMovement, handleDeleteGoal, handleDeleteBudget,
+    handleDeleteMovement,
+    handleDeleteGoal,
+    handleDeleteBudget,
     // Forms
-    formData, setFormData,
-    goalFormData, setGoalFormData,
-    budgetFormData, setBudgetFormData,
+    formData,
+    setFormData,
+    goalFormData,
+    setGoalFormData,
+    budgetFormData,
+    setBudgetFormData,
     // Profile
-    profilePicUrl, setProfilePicUrl,
-    profilePicFile, setProfilePicFile,
-    profileName, setProfileName,
+    profilePicUrl,
+    setProfilePicUrl,
+    profilePicFile,
+    setProfilePicFile,
+    profileName,
+    setProfileName,
     isUploadingProfilePic,
     // Savings
-    savingsPercentage, setSavingsPercentage,
-    savingsDistributionMode, setSavingsDistributionMode,
-    manualSavingsAmount, setManualSavingsAmount,
-    showSuccessFeedback, showFeedback,
+    savingsPercentage,
+    setSavingsPercentage,
+    savingsDistributionMode,
+    setSavingsDistributionMode,
+    manualSavingsAmount,
+    setManualSavingsAmount,
+    showSuccessFeedback,
+    showFeedback,
     // Refresh
     fetchData,
   };

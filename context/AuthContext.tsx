@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         router.replace('/');
       }, 10);
     } catch (err) {
-      console.error("Error saving token:", err);
+      console.error('Error saving token:', err);
     }
   };
 
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       router.replace('/login');
     } catch (err) {
-      console.error("Error clearing session:", err);
+      console.error('Error clearing session:', err);
     }
   };
 

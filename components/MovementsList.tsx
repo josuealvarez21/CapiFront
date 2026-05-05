@@ -54,7 +54,9 @@ export default function MovementsList({
             <div>
               <p className={`${textSize} font-bold text-white`}>{mov.descripcion}</p>
               <p className="text-xs text-gray-400 font-medium mt-1">
-                <span className={`mr-2 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider ${getCategoryBadgeClass(mov.tipo)}`}>
+                <span
+                  className={`mr-2 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider ${getCategoryBadgeClass(mov.tipo)}`}
+                >
                   {mov.categoria}
                 </span>
                 {isCompact ? mov.fecha : `Registrado el ${mov.fecha}`}
@@ -62,8 +64,11 @@ export default function MovementsList({
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className={`font-extrabold ${amountSize} ${mov.tipo === 'ingreso' ? 'text-[#22c55e]' : 'text-white'}`}>
-              {mov.tipo === 'ingreso' ? '+' : '-'}{formatCurrency(mov.monto)}
+            <span
+              className={`font-extrabold ${amountSize} ${mov.tipo === 'ingreso' ? 'text-[#22c55e]' : 'text-white'}`}
+            >
+              {mov.tipo === 'ingreso' ? '+' : '-'}
+              {formatCurrency(mov.monto)}
             </span>
             <button
               onClick={() => onDelete(mov.id)}

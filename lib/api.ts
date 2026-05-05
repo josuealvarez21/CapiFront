@@ -13,7 +13,7 @@ interface ApiRequestOptions extends Omit<RequestInit, 'headers'> {
 
 async function apiRequest<T>(
   endpoint: string,
-  { token, headers = {}, ...options }: ApiRequestOptions = {}
+  { token, headers = {}, ...options }: ApiRequestOptions = {},
 ): Promise<T> {
   const finalHeaders: Record<string, string> = { ...headers };
 
@@ -32,10 +32,7 @@ async function apiRequest<T>(
 
   if (!response.ok) {
     const errorBody = await response.json().catch(() => ({}));
-    throw new ApiError(
-      errorBody.detail || `Error ${response.status}`,
-      response.status
-    );
+    throw new ApiError(errorBody.detail || `Error ${response.status}`, response.status);
   }
 
   return response.json();
@@ -81,10 +78,7 @@ export const api = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new ApiError(
-          errorData.detail || 'Credenciales incorrectas',
-          response.status
-        );
+        throw new ApiError(errorData.detail || 'Credenciales incorrectas', response.status);
       }
 
       return response.json() as Promise<{ access_token: string; token_type: string }>;
@@ -120,13 +114,15 @@ export const api = {
 
   // --- Categories ---
   categories: {
-    list: (token: string) =>
-      apiRequest<CategoriaBackend[]>('/api/v1/categories/', { token }),
+    list: (token: string) => apiRequest<CategoriaBackend[]>('/api/v1/categories/', { token }),
   },
 
   // --- Movements ---
   movements: {
-    create: (token: string, data: { id_categoria: number; monto: number; descripcion: string; fecha: string }) =>
+    create: (
+      token: string,
+      data: { id_categoria: number; monto: number; descripcion: string; fecha: string },
+    ) =>
       apiRequest('/api/v1/movements/', {
         method: 'POST',
         token,
@@ -140,7 +136,15 @@ export const api = {
 
   // --- Goals ---
   goals: {
-    create: (token: string, data: { nombre_meta: string; monto_objetivo: number; monto_actual: number; fecha_limite: string }) =>
+    create: (
+      token: string,
+      data: {
+        nombre_meta: string;
+        monto_objetivo: number;
+        monto_actual: number;
+        fecha_limite: string;
+      },
+    ) =>
       apiRequest('/api/v1/goals/', {
         method: 'POST',
         token,
@@ -170,7 +174,10 @@ export const api = {
 
   // --- Budgets ---
   budgets: {
-    create: (token: string, data: { id_categoria: number; monto_limite: number; mes: number; anio: number }) =>
+    create: (
+      token: string,
+      data: { id_categoria: number; monto_limite: number; mes: number; anio: number },
+    ) =>
       apiRequest('/api/v1/budgets/', {
         method: 'POST',
         token,

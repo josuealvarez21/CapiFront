@@ -67,6 +67,15 @@ El Root Layout envuelve toda la app con dos providers:
 
 ## Gestión de Estado
 
+### Componentes de UI (`components/`)
+Diseño basado en Atomic Design pero simplificado a componentes presentacionales puros:
+- **`BottomNav.tsx`**: Menú de navegación inferior fijado, exclusivo para dispositivos móviles (`md:hidden`). Garantiza una experiencia UX premium tipo "App" en teléfonos.
+- **`Sidebar.tsx`**: Menú lateral de navegación, exclusivo para pantallas grandes (`hidden md:flex`).
+- **`SummaryCards.tsx`**: Tarjetas animadas que muestran el total de ingresos, gastos y balance.
+- **`MovementsList.tsx`**: Tabla de transacciones con soporte para borrado, reutilizable en dashboard y vistas completas.
+- **`charts/IncomeExpenseChart.tsx`**: Gráfico circular (Recharts) que ilustra la proporción de gastos vs ingresos, diseñado de manera fluida y escalable.
+- **Modales (`modals/`)**: Construidos sobre un componente base `Modal.tsx` responsivo con control de scroll (`max-h-[90vh]`), para centralizar la creación y edición de entidades.
+
 ### AuthContext
 
 El estado de autenticación se gestiona con un **React Context** global:
@@ -94,7 +103,6 @@ stateDiagram-v2
 ### Estado Local (Dashboard)
 
 El dashboard principal (`page.tsx`) maneja su propio estado local con múltiples `useState` para:
-- Datos del dashboard (summary, movimientos, metas, presupuestos)
 - Estados de modales (agregar movimiento, meta, presupuesto)
 - Estados de formularios
 - Vista de secciones activas

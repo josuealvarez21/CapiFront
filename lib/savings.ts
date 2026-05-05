@@ -14,7 +14,7 @@ export interface SavingsAllocation {
 export function calculateSavingsDistribution(
   totalToDistribute: number,
   metas: Meta[],
-  mode: SavingsDistributionMode
+  mode: SavingsDistributionMode,
 ): SavingsAllocation[] {
   if (totalToDistribute <= 0) return [];
 
@@ -25,9 +25,7 @@ export function calculateSavingsDistribution(
 
   if (mode === 'equitativa') {
     const perMeta = totalToDistribute / activeMetas.length;
-    activeMetas.forEach((m) =>
-      allocations.push({ id_meta: parseInt(m.id), monto: perMeta })
-    );
+    activeMetas.forEach((m) => allocations.push({ id_meta: parseInt(m.id), monto: perMeta }));
   } else {
     // Priority: fill goals closest to deadline first
     let remaining = totalToDistribute;
@@ -62,7 +60,7 @@ export function getProjectedForMeta(
   meta: Meta,
   allMetas: Meta[],
   totalToDistribute: number,
-  mode: SavingsDistributionMode
+  mode: SavingsDistributionMode,
 ): number {
   if (totalToDistribute <= 0) return 0;
 

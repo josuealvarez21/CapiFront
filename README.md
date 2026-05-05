@@ -15,6 +15,7 @@ CapiFront es la interfaz de usuario de la aplicación Cápi. Ofrece:
 - **Autenticación completa**: Login con email/password, registro, recuperación de contraseña y Google OAuth2.
 - **Perfil de usuario**: Configuración de nombre y foto de perfil.
 - **Diseño premium**: Dark mode, glassmorphism, gradientes, micro-animaciones con Framer Motion.
+- **Mobile First**: Interfaz totalmente responsive, con `BottomNav` para navegación móvil y layouts adaptables que escalan perfectamente en tablets y desktop.
 
 ---
 
