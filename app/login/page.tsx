@@ -5,6 +5,7 @@ import { Mail, Lock, LogIn, Globe, ArrowRight, UserPlus, Fingerprint } from 'luc
 import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
 import { useGoogleLogin } from '@react-oauth/google';
+import { api, ApiError } from '@/lib/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,7 +16,6 @@ export default function LoginPage() {
   const googleLogin = useGoogleLogin({
     onSuccess: tokenResponse => {
       console.log('Google Success:', tokenResponse);
-      // Aquí enviaríamos tokenResponse.access_token al backend
       alert("¡Éxito! Ahora solo falta conectar este token con tu servidor.");
     },
     onError: () => alert('Error al iniciar sesión con Google'),
@@ -26,26 +26,14 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      const params = new URLSearchParams();
-      params.append('username', email);
-      params.append('password', password);
-
-      const response = await fetch('http://localhost:8000/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        login(data.access_token);
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        alert(errorData.detail || 'Credenciales incorrectas o error en el servidor');
-      }
+      const data = await api.auth.login(email, password);
+      login(data.access_token);
     } catch (error) {
-      console.error(error);
-      alert('Error de conexión con el servidor');
+      if (error instanceof ApiError) {
+        alert(error.message);
+      } else {
+        alert('Error de conexión con el servidor');
+      }
     } finally {
       setIsLoading(false);
     }

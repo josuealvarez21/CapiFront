@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Key, ArrowLeft, Send } from 'lucide-react';
 import Link from 'next/link';
+import { api, ApiError } from '@/lib/api';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -14,18 +15,14 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/auth/forgot-password?email=${encodeURIComponent(email)}`, {
-        method: 'POST'
-      });
-
-      if (response.ok) {
-        setIsSent(true);
-      } else {
-        alert('No encontramos ninguna cuenta con ese correo');
-      }
+      await api.auth.forgotPassword(email);
+      setIsSent(true);
     } catch (error) {
-      console.error(error);
-      alert('Error de conexión');
+      if (error instanceof ApiError) {
+        alert('No encontramos ninguna cuenta con ese correo');
+      } else {
+        alert('Error de conexión');
+      }
     } finally {
       setIsLoading(false);
     }

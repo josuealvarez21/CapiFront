@@ -100,39 +100,32 @@ CapiFront es la interfaz de usuario de la aplicación Cápi. Ofrece:
 
 ## 📁 Estructura del Proyecto
 
-```
+```text
 CapiFront/
-├── app/                        # App Router de Next.js
-│   ├── favicon.ico             # Ícono de la aplicación
-│   ├── globals.css             # Estilos globales + TailwindCSS
-│   ├── layout.tsx              # Root layout (providers, fonts, metadata)
-│   ├── page.tsx                # Dashboard principal (~1700 líneas)
-│   ├── login/
-│   │   └── page.tsx            # Página de login
-│   ├── register/
-│   │   └── page.tsx            # Página de registro
-│   └── forgot-password/
-│       └── page.tsx            # Recuperación de contraseña
-├── context/
-│   └── AuthContext.tsx         # Proveedor de autenticación (React Context)
-├── public/                     # Assets estáticos
-│   ├── file.svg
-│   ├── globe.svg
-│   ├── next.svg
-│   ├── vercel.svg
-│   └── window.svg
-├── docs/                       # Documentación técnica
-│   ├── architecture.md
-│   ├── components.md
-│   └── technical_decisions.md
-├── .env.example                # Template de variables de entorno
-├── .gitignore
-├── eslint.config.mjs           # Configuración ESLint
-├── next.config.ts              # Configuración Next.js
-├── package.json                # Dependencias y scripts
-├── postcss.config.mjs          # Configuración PostCSS (TailwindCSS v4)
-├── tsconfig.json               # Configuración TypeScript
-└── README.md                   # Este archivo
+├── app/                  # Next.js App Router
+│   ├── page.tsx          # Dashboard principal (modular)
+│   ├── layout.tsx        # Layout base y configuración (Auth, Google OAuth)
+│   └── (auth)/           # Rutas de autenticación (login, register, forgot-password)
+├── components/           # Componentes UI reutilizables
+│   ├── Sidebar.tsx
+│   ├── SummaryCards.tsx
+│   ├── MovementsList.tsx
+│   ├── SavingsPlanner.tsx
+│   ├── charts/           # Gráficos (Recharts)
+│   └── modals/           # Componentes modales reutilizables
+├── context/              # Contextos globales de React (AuthContext)
+├── hooks/                # Custom hooks (useDashboard)
+├── lib/                  # Utilidades y servicios
+│   ├── api.ts            # Cliente HTTP centralizado
+│   ├── savings.ts        # Lógica de distribución de ahorros
+│   ├── types.ts          # Interfaces TypeScript
+│   └── utils.tsx         # Utilidades y helpers
+├── docs/                 # Documentación técnica
+├── public/               # Assets estáticos
+├── eslint.config.mjs     # Configuración ESLint
+├── next.config.ts        # Configuración Next.js
+├── package.json          # Dependencias y scripts
+└── tsconfig.json         # Configuración TypeScript
 ```
 
 ---

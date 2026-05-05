@@ -2,8 +2,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface AuthUser {
+  email: string;
+}
+
 interface AuthContextType {
-  user: any;
+  user: AuthUser | null;
   token: string | null;
   login: (token: string) => void;
   logout: () => void;
@@ -13,7 +17,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -24,7 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const savedToken = localStorage.getItem('capi_token');
         if (savedToken) {
           setToken(savedToken);
-          setUser({ email: 'usuario@ejemplo.com' }); // Placeholder
+          setUser({ email: 'authenticated' });
         }
       }
       setLoading(false);
@@ -38,8 +42,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         localStorage.setItem('capi_token', newToken);
       }
       setToken(newToken);
-      setUser({ email: 'usuario@ejemplo.com' }); // Placeholder
-      
+      setUser({ email: 'authenticated' });
+
       // Give state a tiny moment to settle before redirecting
       setTimeout(() => {
         router.replace('/');

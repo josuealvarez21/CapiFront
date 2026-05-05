@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, User, Sparkles, ArrowRight, LogIn, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { api, ApiError } from '@/lib/api';
 
 export default function RegisterPage() {
   const [nombre, setNombre] = useState('');
@@ -17,22 +18,15 @@ export default function RegisterPage() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, email, password })
-      });
-
-      if (response.ok) {
-        alert('Cuenta creada con éxito. Ya puedes iniciar sesión.');
-        router.push('/login');
-      } else {
-        const errorData = await response.json();
-        alert(errorData.detail || 'Error al crear la cuenta');
-      }
+      await api.auth.signup(nombre, email, password);
+      alert('Cuenta creada con éxito. Ya puedes iniciar sesión.');
+      router.push('/login');
     } catch (error) {
-      console.error(error);
-      alert('Error de conexión con el servidor');
+      if (error instanceof ApiError) {
+        alert(error.message);
+      } else {
+        alert('Error de conexión con el servidor');
+      }
     } finally {
       setIsLoading(false);
     }
