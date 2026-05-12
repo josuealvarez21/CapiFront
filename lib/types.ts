@@ -63,3 +63,37 @@ export interface CategoriaBackend {
 export type TabType = 'dashboard' | 'ingresos' | 'gastos' | 'metas' | 'presupuestos';
 export type ModalMovementType = 'ambos' | 'ingreso' | 'gasto';
 export type SavingsDistributionMode = 'equitativa' | 'prioridad';
+
+// --- Admin Types ---
+export interface AdminStats {
+  total_usuarios: number;
+  usuarios_admin: number;
+  total_movimientos: number;
+}
+
+export interface AdminUserListItem {
+  id_usuario: number;
+  nombre: string;
+  email: string;
+  rol: string;
+  fecha_registro: string | null;
+  total_movimientos: number;
+}
+
+export interface AdminUserDetail {
+  id_usuario: number;
+  nombre: string;
+  email: string;
+  rol: string;
+  foto_perfil: string | null;
+  fecha_registro: string | null;
+  total_movimientos: number;
+}
+
+export interface AdminUserUpdate {
+  nombre?: string;
+  email?: string;
+  rol?: string;
+}
+
+export type AdminTabType = 'dashboard' | 'users';
