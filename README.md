@@ -57,9 +57,11 @@ CapiFront es la interfaz de usuario de la aplicación Cápi. Ofrece:
 
 3. **Configurar variables de entorno**
    ```bash
-   copy .env.example .env
-   # Edita .env con la URL del backend y tu Google Client ID
+   copy .env.example .env.local
+   # Edita .env.local con la URL del backend y tu Google Client ID
    ```
+
+   > **Nota**: Next.js usa `.env.local` para variables de entorno locales. El Google Client ID debe ser un Web OAuth 2.0 Client registrado en [Google Cloud Console](https://console.cloud.google.com/apis/credentials) con `http://localhost:3000` como **Origen JavaScript autorizado**.
 
 4. **Ejecutar en modo desarrollo**
    ```bash

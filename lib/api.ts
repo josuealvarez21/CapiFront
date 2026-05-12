@@ -97,6 +97,21 @@ export const api = {
         method: 'POST',
       });
     },
+
+    googleLogin: async (accessToken: string) => {
+      const response = await fetch(`${API_BASE}/api/v1/auth/google-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ access_token: accessToken }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new ApiError(errorData.detail || 'Error al autenticar con Google', response.status);
+      }
+
+      return response.json() as Promise<{ access_token: string; token_type: string }>;
+    },
   },
 
   // --- Dashboard ---
