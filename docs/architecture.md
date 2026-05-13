@@ -137,8 +137,9 @@ if (response.ok) {
 ### Endpoints Consumidos
 
 | Frontend Page | Backend Endpoint | Descripción |
-|---|---|---|
-| Login | `POST /auth/login` | Autenticación |
+|---|---|---|---|
+| Login | `POST /auth/login` | Autenticación email/password |
+| Login | `POST /auth/google-login` | Autenticación Google OAuth2 |
 | Register | `POST /auth/signup` | Registro |
 | Forgot Password | `POST /auth/forgot-password` | Recuperación |
 | Dashboard | `GET /dashboard/` | Datos completos |

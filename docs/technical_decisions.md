@@ -109,16 +109,28 @@ const config = {
 
 ## 8. Google OAuth via @react-oauth/google
 
-**Decisión**: Usar el SDK oficial `@react-oauth/google`.
+**Decisión**: Usar el SDK oficial `@react-oauth/google` con verificación del access token en el backend.
 
 **Justificación**:
 - SDK oficial mantenido por Google.
-- Hook `useGoogleLogin()` para flow personalizado.
+- Hook `useGoogleLogin()` para el botón personalizado con estilos consistentes.
 - `GoogleOAuthProvider` como wrapper simple.
 - No requiere cargar el SDK de Google manualmente.
 - Compatible con React 19.
 
-**Estado actual**: El flow de Google está parcialmente implementado (el token de Google se obtiene pero no se valida contra el backend).
+**Flujo de autenticación con Google**:
+1. El usuario hace clic en el botón "Google" → `useGoogleLogin()` abre el popup de OAuth.
+2. Google devuelve un `access_token` al frontend.
+3. El frontend envía el `access_token` a `POST /api/v1/auth/google-login`.
+4. El backend verifica el token contra `https://www.googleapis.com/oauth2/v3/userinfo`.
+5. Extrae `sub` (google_id), `email`, `name` y `picture`.
+6. Busca usuario por `google_id` primero, luego por `email`.
+7. Si existe: vincula la cuenta de Google si no estaba vinculada.
+8. Si no existe: crea un nuevo usuario con `hashed_password = None`.
+9. Genera un JWT de Cápi y lo devuelve al frontend.
+10. El frontend guarda el JWT y redirige al dashboard.
+
+**Estado actual**: ✅ Completamente implementado y funcional.
 
 ---
 

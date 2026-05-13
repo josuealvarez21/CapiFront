@@ -144,6 +144,14 @@ El dashboard contiene varios sub-componentes renderizados inline:
 3. Si OK → `login(token)` del AuthContext → redirect a `/`
 4. Si error → muestra alerta con detalle
 
+### Flujo Google OAuth
+1. Usuario hace clic en botón "Google"
+2. `useGoogleLogin()` abre popup de Google
+3. Google devuelve `access_token`
+4. Frontend envía token a `POST /api/v1/auth/google-login`
+5. Backend verifica token con Google API y devuelve JWT de Cápi
+6. `login(data.access_token)` → redirect a `/`
+
 ### Design
 - Card centrada con glassmorphism y glow effects
 - Gradiente azul → verde en el ícono
