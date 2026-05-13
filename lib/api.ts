@@ -1,4 +1,4 @@
-import type { DashboardData, CategoriaBackend } from './types';
+import type { DashboardData, CategoriaBackend, AdminStats, AdminUserListItem, AdminUserDetail, AdminUserUpdate } from './types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -98,6 +98,7 @@ export const api = {
       });
     },
 
+    me: (token: string) => apiRequest<{ id_usuario: number; nombre: string; email: string; rol: string }>('/api/v1/auth/me', { token }),
     googleLogin: async (accessToken: string) => {
       const response = await fetch(`${API_BASE}/api/v1/auth/google-login`, {
         method: 'POST',
@@ -218,5 +219,31 @@ export const api = {
 
       return response.json();
     },
+  },
+
+  // --- Admin ---
+  admin: {
+    getStats: (token: string) =>
+      apiRequest<AdminStats>('/api/v1/admin/stats', { token }),
+
+    listUsers: (token: string, params?: { rol?: string; skip?: number; limit?: number }) => {
+      const searchParams = new URLSearchParams();
+      if (params?.rol) searchParams.set('rol', params.rol);
+      if (params?.skip) searchParams.set('skip', String(params.skip));
+      if (params?.limit) searchParams.set('limit', String(params.limit));
+      const qs = searchParams.toString();
+      return apiRequest<AdminUserListItem[]>(`/api/v1/admin/users${qs ? `?${qs}` : ''}`, { token });
+    },
+
+    getUser: (token: string, id: number) =>
+      apiRequest<AdminUserDetail>(`/api/v1/admin/users/${id}`, { token }),
+
+    updateUser: (token: string, id: number, data: AdminUserUpdate) =>
+      apiRequest<AdminUserListItem>(`/api/v1/admin/users/${id}`, {
+        method: 'PUT',
+        token,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
   },
 };

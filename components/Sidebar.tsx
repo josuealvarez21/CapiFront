@@ -8,8 +8,11 @@ import {
   Wallet,
   Settings,
   LogOut,
+  Shield,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import type { TabType, UserData } from '@/lib/types';
 
 interface SidebarProps {
@@ -71,6 +74,8 @@ export default function Sidebar({
   onOpenSettings,
   onLogout,
 }: SidebarProps) {
+  const { rol } = useAuth();
+  const router = useRouter();
   return (
     <aside className="w-64 bg-[#1e1e1e] border-r border-[#2e2e2e] flex flex-col justify-between hidden md:flex z-10 sticky top-0 h-screen shadow-2xl">
       <div>
@@ -121,6 +126,14 @@ export default function Sidebar({
       </div>
 
       <div className="p-4 space-y-2 mb-4">
+        {rol === 'admin' && (
+          <button
+            onClick={() => router.push('/admin')}
+            className="w-full flex items-center gap-4 px-5 py-4 text-purple-400 hover:bg-purple-500/10 rounded-xl font-medium transition-colors"
+          >
+            <Shield size={22} /> Admin Panel
+          </button>
+        )}
         <button
           onClick={onOpenSettings}
           className="w-full flex items-center gap-4 px-5 py-4 text-gray-500 hover:bg-[#2e2e2e] hover:text-white rounded-xl font-medium transition-colors"
