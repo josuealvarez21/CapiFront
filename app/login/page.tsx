@@ -14,8 +14,20 @@ export default function LoginPage() {
   const { login } = useAuth();
 
   const googleLogin = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      alert('¡Éxito! Ahora solo falta conectar este token con tu servidor.');
+    onSuccess: async (tokenResponse) => {
+      setIsLoading(true);
+      try {
+        const data = await api.auth.googleLogin(tokenResponse.access_token);
+        login(data.access_token);
+      } catch (error) {
+        if (error instanceof ApiError) {
+          alert(error.message);
+        } else {
+          alert('Error al iniciar sesión con Google');
+        }
+      } finally {
+        setIsLoading(false);
+      }
     },
     onError: () => alert('Error al iniciar sesión con Google'),
   });
