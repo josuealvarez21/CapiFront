@@ -97,3 +97,25 @@ export interface AdminUserUpdate {
 }
 
 export type AdminTabType = 'dashboard' | 'users';
+
+// --- Chat Types ---
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
+
+export interface ConfirmationRequest {
+  tool: string;
+  args: Record<string, unknown>;
+  temp_id: string;
+}
+
+export interface SSEEvent {
+  type: 'token' | 'confirmation_required' | 'done' | 'error' | 'result';
+  content?: string;
+  tool?: string;
+  args?: Record<string, unknown>;
+  temp_id?: string;
+}

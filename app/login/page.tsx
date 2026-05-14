@@ -1,36 +1,20 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Globe, ArrowRight, UserPlus, Fingerprint } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
-import { useGoogleLogin } from '@react-oauth/google';
 import { api, ApiError } from '@/lib/api';
+
+const GoogleLoginButton = lazy(() => import('@/components/GoogleLoginButton'));
+
+const hasGoogleId = !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
-
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setIsLoading(true);
-      try {
-        const data = await api.auth.googleLogin(tokenResponse.access_token);
-        login(data.access_token);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          alert(error.message);
-        } else {
-          alert('Error al iniciar sesión con Google');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    onError: () => alert('Error al iniciar sesión con Google'),
-  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,13 +128,20 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => googleLogin()}
-            className="w-full bg-white text-black hover:bg-gray-100 py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-          >
-            <Globe size={22} /> Google
-          </button>
+          {hasGoogleId ? (
+            <Suspense fallback={null}>
+              <GoogleLoginButton setIsLoading={setIsLoading} />
+            </Suspense>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="w-full bg-white/10 text-gray-400 py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-3 cursor-not-allowed"
+              title="Configurar Google Client ID en .env.local"
+            >
+              <Globe size={22} /> Google
+            </button>
+          )}
         </div>
 
         <p className="mt-10 text-center text-gray-500 text-sm font-medium">
