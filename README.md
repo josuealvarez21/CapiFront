@@ -13,6 +13,7 @@ CapiFront es la interfaz de usuario de la aplicación Cápi. Ofrece:
 - **Metas de ahorro**: Visualización de progreso, asignación de fondos y seguimiento de objetivos.
 - **Presupuestos**: Control visual de límites de gasto por categoría.
 - **Autenticación completa**: Login con email/password, registro, recuperación de contraseña y Google OAuth2.
+- **CapiBot 🤖**: Asistente IA integrado en el Dashboard para resolver dudas financieras en lenguaje natural con respuestas en tiempo real.
 - **Perfil de usuario**: Configuración de nombre y foto de perfil.
 - **Diseño premium**: Dark mode, glassmorphism, gradientes, micro-animaciones con Framer Motion.
 - **Mobile First**: Interfaz totalmente responsive, con `BottomNav` para navegación móvil y layouts adaptables que escalan perfectamente en tablets y desktop.
@@ -31,6 +32,7 @@ CapiFront es la interfaz de usuario de la aplicación Cápi. Ofrece:
 | **Recharts** | 3.x | Gráficos y visualizaciones |
 | **Lucide React** | 1.7+ | Iconografía |
 | **@react-oauth/google** | 0.13+ | Integración Google OAuth2 |
+| **Google Gemini API** | - | Asistente IA (CapiBot) con streaming SSE |
 
 ---
 
@@ -88,7 +90,52 @@ CapiFront es la interfaz de usuario de la aplicación Cápi. Ofrece:
    - Estado de presupuestos
 4. **Agregar movimientos**: Usa los modales del dashboard para registrar ingresos/gastos.
 5. **Metas**: Crea y gestiona metas de ahorro con asignación de fondos.
-6. **Perfil**: Configura tu nombre y foto de perfil desde el panel de settings.
+6. **CapiBot**: Haz clic en el ícono flotante en la esquina inferior derecha para hablar con el asistente IA sobre tus finanzas.
+7. **Perfil**: Configura tu nombre y foto de perfil desde el panel de settings.
+
+---
+
+## 🤖 CapiBot — Asistente IA de Finanzas
+
+> Chatbot inteligente integrado directamente en el Dashboard para resolver dudas financieras en lenguaje natural.
+
+### Descripción
+
+CapiBot es un asistente conversacional impulsado por inteligencia artificial que permite a los usuarios interactuar con sus datos financieros mediante preguntas en lenguaje natural. Está accesible desde un **widget flotante** en la esquina inferior derecha del Dashboard.
+
+**Capacidades principales:**
+- Responder preguntas sobre ingresos, gastos, metas y presupuestos del usuario autenticado
+- Ejecutar acciones contextuales como registrar movimientos, ajustar metas o modificar presupuestos mediante tarjetas de confirmación
+- Mantener contexto de la conversación para respuestas coherentes y seguimiento
+- Streaming de respuestas en tiempo real con animación de escritura
+
+### Stack Tecnológico
+
+| Componente | Tecnología |
+|---|---|
+| **Modelo de IA** | Google Gemini API (`gemini-2.5-flash-lite`) |
+| **Streaming** | Server-Sent Events (SSE) — respuestas en tiempo real |
+| **Frontend** | React custom hook (`useChat.ts`) + Framer Motion (animaciones) |
+| **Backend** | FastAPI con SSE endpoint + tools de base de datos |
+| **Herramientas (Tools)** | Consultas SQL sobre movimientos, metas, presupuestos del usuario |
+
+### Variables de Entorno (Backend)
+
+```env
+GOOGLE_API_KEY=tu_api_key_aqui
+GEMINI_API_KEY=tu_api_key_aqui
+GEMINI_MODEL=gemini-2.5-flash-lite
+```
+
+### Flujo de Trabajo (Frontend ↔ Backend)
+
+1. El usuario escribe un mensaje en el `ChatInput` del widget flotante
+2. El hook `useChat` envía `POST /api/v1/chat/ask` con el mensaje y el historial de la conversación
+3. El backend recibe el mensaje, lo envía a Gemini API junto con las herramientas (tools) disponibles para consultar la base de datos
+4. Gemini decide si responder directamente o invocar una tool (ej. obtener gastos del mes)
+5. La respuesta se transmite al frontend mediante **SSE (Server-Sent Events)** en fragmentos de texto
+6. El frontend renderiza cada fragmento en el `ChatMessage` con efecto de escritura en tiempo real
+7. Si la respuesta incluye una acción (ej. registrar un gasto), se muestra una `ConfirmationCard` para que el usuario confirme antes de ejecutar
 
 ### Scripts Disponibles
 
