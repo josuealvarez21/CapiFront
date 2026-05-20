@@ -111,7 +111,7 @@ export function useDashboard() {
   }, [token, handleApiError]);
 
   useEffect(() => {
-    if (token) {
+    if (!authLoading && token) {
       const init = async () => {
         setLoading(true);
         await fetchCategories();
@@ -120,7 +120,7 @@ export function useDashboard() {
       };
       init();
     }
-  }, [token, fetchData, fetchCategories]);
+  }, [token, authLoading, fetchData, fetchCategories]);
 
   // --- Actions ---
   const openMovementModal = (type: ModalMovementType) => {
