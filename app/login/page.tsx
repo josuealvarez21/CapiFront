@@ -22,10 +22,8 @@ export default function LoginPage() {
   const validarCampoEmail = (valor: string): string | undefined => {
     if (valor.includes(' ')) return 'El correo electrónico no puede contener espacios en blanco';
     if (!valor) return 'El correo es obligatorio';
-    if (!valor.endsWith('@gmail.com'))
-      return 'El formato del correo debe ser exclusivamente @gmail.com';
-    const username = valor.split('@')[0];
-    if (!username) return 'Debes ingresar un correo electrónico válido antes de @gmail.com';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor))
+      return 'Ingresa un correo electrónico válido';
     return undefined;
   };
 
