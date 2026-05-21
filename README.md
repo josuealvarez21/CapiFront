@@ -82,6 +82,10 @@ CapiFront es la interfaz de usuario de la aplicación Cápi. Ofrece:
 
 1. **Registro**: Navega a `/register` para crear una cuenta.
 2. **Login**: Inicia sesión en `/login` con email/password o Google.
+
+> **Admin predefinido**: `admin@capi.com` / `Admin123!` (rol `admin`)
+
+3. **Dashboard**: Accede al panel principal en `/` donde verás:
 3. **Dashboard**: Accede al panel principal en `/` donde verás:
    - Resumen financiero (balance, ingresos, gastos del mes)
    - Gráfico de distribución de gastos por categoría
