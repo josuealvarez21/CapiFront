@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Shield, User, Eye, ChevronLeft, ChevronRight, Pencil, X, Save } from 'lucide-react';
+import { Shield, User, ChevronLeft, ChevronRight, Pencil, X, Save } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import type { AdminUserListItem, AdminUserDetail } from '@/lib/types';
