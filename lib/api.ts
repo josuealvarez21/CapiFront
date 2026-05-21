@@ -221,6 +221,49 @@ export const api = {
     },
   },
 
+  // --- Chat ---
+  chat: {
+    send: (token: string, message: string): Promise<Response> => {
+      return fetch(`${API_BASE}/api/v1/chat/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ message }),
+      });
+    },
+
+    confirm: (token: string, tempId: string) =>
+      apiRequest<{ type: string; content: string }>('/api/v1/chat/confirm', {
+        method: 'POST',
+        token,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ temp_id: tempId }),
+      }),
+
+    history: async (token: string, skip = 0, limit = 30) => {
+      const searchParams = new URLSearchParams({ skip: String(skip), limit: String(limit) });
+      const data = await apiRequest<{
+        messages: { id_mensaje: number; rol: string; contenido: string; fecha_hora: string }[];
+        total: number;
+      }>(`/api/v1/chat/history?${searchParams.toString()}`, { token });
+
+      return {
+        messages: data.messages.map((m) => ({
+          id: String(m.id_mensaje),
+          role: (m.rol === 'usuario' ? 'user' : 'assistant') as 'user' | 'assistant',
+          content: m.contenido,
+          timestamp: m.fecha_hora,
+        })),
+        total: data.total,
+      };
+    },
+
+    clear: (token: string) =>
+      apiRequest<void>('/api/v1/chat/history', { method: 'DELETE', token }),
+  },
+
   // --- Admin ---
   admin: {
     getStats: (token: string) =>

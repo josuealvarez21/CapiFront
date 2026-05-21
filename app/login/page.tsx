@@ -1,11 +1,14 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Globe, ArrowRight, UserPlus, Fingerprint, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
-import { useGoogleLogin } from '@react-oauth/google';
 import { api, ApiError } from '@/lib/api';
+
+const GoogleLoginButton = lazy(() => import('@/components/GoogleLoginButton'));
+
+const hasGoogleId = !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,25 +18,6 @@ export default function LoginPage() {
   const [errores, setErrores] = useState<{ email?: string; password?: string }>({});
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
   const { login } = useAuth();
-
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setIsLoading(true);
-      try {
-        const data = await api.auth.googleLogin(tokenResponse.access_token);
-        login(data.access_token);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          alert(error.message);
-        } else {
-          alert('Error al iniciar sesión con Google');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    onError: () => alert('Error al iniciar sesión con Google'),
-  });
 
   const validarCampoEmail = (valor: string): string | undefined => {
     if (valor.includes(' ')) return 'El correo electrónico no puede contener espacios en blanco';
@@ -245,13 +229,20 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => googleLogin()}
-            className="w-full bg-white text-black hover:bg-gray-100 py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-          >
-            <Globe size={22} /> Google
-          </button>
+          {hasGoogleId ? (
+            <Suspense fallback={null}>
+              <GoogleLoginButton setIsLoading={setIsLoading} />
+            </Suspense>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="w-full bg-white/10 text-gray-400 py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-3 cursor-not-allowed"
+              title="Configurar Google Client ID en .env.local"
+            >
+              <Globe size={22} /> Google
+            </button>
+          )}
         </div>
 
         <p className="mt-10 text-center text-gray-500 text-sm font-medium">
