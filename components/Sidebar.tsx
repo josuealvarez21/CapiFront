@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   LayoutDashboard,
   TrendingUp,
@@ -10,7 +11,7 @@ import {
   LogOut,
   Shield,
 } from 'lucide-react';
-import Image from 'next/image';
+
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import type { TabType, UserData } from '@/lib/types';
@@ -76,6 +77,9 @@ export default function Sidebar({
 }: SidebarProps) {
   const { rol } = useAuth();
   const router = useRouter();
+  const [avatarError, setAvatarError] = useState(false);
+  const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=121212&color=fff`;
+  const avatarSrc = avatarError || !user.foto_perfil ? fallbackUrl : user.foto_perfil;
   return (
     <aside className="w-64 bg-[#1e1e1e] border-r border-[#2e2e2e] flex flex-col justify-between hidden md:flex z-10 sticky top-0 h-screen shadow-2xl">
       <div>
@@ -90,15 +94,12 @@ export default function Sidebar({
 
         <div className="px-6 pb-6 flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#3b82f6] to-[#22c55e] p-[2px] shadow-lg shrink-0">
-            <Image
-              src={
-                user.foto_perfil ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=121212&color=fff`
-              }
+            <img
+              src={avatarSrc}
               alt="Profile"
               width={48}
               height={48}
-              unoptimized
+              onError={() => setAvatarError(true)}
               className="w-full h-full rounded-full object-cover border-2 border-[#1e1e1e]"
             />
           </div>
