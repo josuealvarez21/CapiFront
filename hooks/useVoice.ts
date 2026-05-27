@@ -47,7 +47,7 @@ export function useVoice() {
         'no-speech': 'No se detectó audio. Intenta hablar más cerca del micrófono.',
         'aborted': 'Grabación cancelada.',
         'audio-capture': 'No se encontró micrófono. Conecta uno e intenta de nuevo.',
-        'network': 'Error de red al procesar el audio.',
+        'network': 'El navegador bloqueó el servicio de voz de Google. En Edge: Configuración > Privacidad > Excepciones de Prevención de Rastreo, agrega esta página. O prueba con Chrome.',
         'service-not-allowed': 'Servicio de voz no permitido.',
       };
       setMicError(reasons[event.error] || `Error de micrófono: ${event.error}`);
