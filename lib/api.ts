@@ -270,7 +270,10 @@ export const api = {
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-      if (!res.ok) throw new Error('Transcripción falló');
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`Transcripción falló (${res.status}): ${body}`);
+      }
       return res.json();
     },
 
