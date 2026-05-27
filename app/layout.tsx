@@ -20,7 +20,6 @@ export const metadata: Metadata = {
 
 import { AuthProvider } from '../context/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { ChatWidget } from '../components/chat/ChatWidget';
 
 export default function RootLayout({
   children,
@@ -36,13 +35,11 @@ export default function RootLayout({
           <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
             <AuthProvider>
               {children}
-              <ChatWidget />
             </AuthProvider>
           </GoogleOAuthProvider>
         ) : (
           <AuthProvider>
             {children}
-            <ChatWidget />
           </AuthProvider>
         )}
       </body>

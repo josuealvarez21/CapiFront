@@ -122,12 +122,6 @@ export function useDashboard() {
     }
   }, [token, authLoading, fetchData, fetchCategories]);
 
-  useEffect(() => {
-    const handler = () => fetchData();
-    window.addEventListener('capi:data-changed', handler);
-    return () => window.removeEventListener('capi:data-changed', handler);
-  }, [fetchData]);
-
   // --- Actions ---
   const openMovementModal = (type: ModalMovementType) => {
     setModalType(type);

@@ -27,6 +27,7 @@ import MovementModal from '@/components/modals/MovementModal';
 import GoalModal from '@/components/modals/GoalModal';
 import BudgetModal from '@/components/modals/BudgetModal';
 import SettingsModal from '@/components/modals/SettingsModal';
+import { ChatWidget } from '@/components/chat/ChatWidget';
 
 export default function SinglePageApp() {
   const dashboard = useDashboard();
@@ -393,6 +394,7 @@ export default function SinglePageApp() {
         setProfilePicFile={setProfilePicFile}
         isUploading={isUploadingProfilePic}
       />
+      <ChatWidget onDataChange={fetchData} />
     </div>
   );
 }
