@@ -14,6 +14,8 @@ export function useChat(onDataChange?: () => void) {
 
   const abortRef = useRef<AbortController | null>(null);
   const streamRef = useRef<ReadableStreamDefaultReader | null>(null);
+  const onDataChangeRef = useRef(onDataChange);
+  onDataChangeRef.current = onDataChange;
 
   const addMessage = useCallback((role: 'user' | 'assistant', content: string) => {
     const msg: ChatMessage = {
@@ -53,8 +55,9 @@ export function useChat(onDataChange?: () => void) {
           buffer = lines.pop() || '';
 
           for (const line of lines) {
-            if (!line.startsWith('data: ')) continue;
-            const jsonStr = line.slice(6).trim();
+            const cleaned = line.replace('\r', '');
+            if (!cleaned.startsWith('data:')) continue;
+            const jsonStr = cleaned.slice(5).trim();
             if (!jsonStr) continue;
 
             try {
@@ -89,7 +92,7 @@ export function useChat(onDataChange?: () => void) {
           }
         }
       } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
+        if (err instanceof Error && err.name !== 'AbortError') {
           setIsLoading(false);
         }
       }
@@ -100,6 +103,9 @@ export function useChat(onDataChange?: () => void) {
   const sendMessage = useCallback(
     async (content: string) => {
       if (!token || !content.trim() || isLoading) return;
+
+      abortRef.current?.abort();
+      streamRef.current?.cancel();
 
       setConfirmation(null);
       addMessage('user', content);
@@ -134,9 +140,8 @@ export function useChat(onDataChange?: () => void) {
 
         streamRef.current = reader;
         await parseSSE(reader);
-        setIsLoading(false);
       } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
+        if (err instanceof Error && err.name !== 'AbortError') {
           clearTimeout(timeoutId);
           updateLastMessage('Error de conexión.');
           setIsLoading(false);
@@ -159,7 +164,6 @@ export function useChat(onDataChange?: () => void) {
         return;
       }
 
-      setConfirmation(null);
       setIsLoading(true);
 
       const timeoutId = setTimeout(() => {
@@ -170,19 +174,21 @@ export function useChat(onDataChange?: () => void) {
       try {
         const result = await api.chat.confirm(token, confirmation.temp_id);
         clearTimeout(timeoutId);
+        setConfirmation(null);
+        setIsLoading(false);
         if (result.type === 'error') {
           addMessage('assistant', `Error: ${result.content}`);
         } else {
           addMessage('assistant', result.content);
-          onDataChange?.();
+          onDataChangeRef.current?.();
         }
       } catch {
         clearTimeout(timeoutId);
-        addMessage('assistant', 'Error al confirmar la operación.');
+        setIsLoading(false);
+        addMessage('assistant', 'Error al confirmar. Intenta de nuevo.');
       }
-      setIsLoading(false);
     },
-    [confirmation, token, addMessage, onDataChange],
+    [confirmation, token, addMessage],
   );
 
   const loadHistory = useCallback(async () => {
