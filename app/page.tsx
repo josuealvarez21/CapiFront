@@ -119,6 +119,7 @@ export default function SinglePageApp() {
         >
           Reintentar
         </button>
+        <ChatWidget />
       </div>
     );
   }
