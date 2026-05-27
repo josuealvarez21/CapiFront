@@ -4,7 +4,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import type { ChatMessage, ConfirmationRequest, SSEEvent } from '@/lib/types';
 
-export function useChat() {
+export function useChat(onDataChange?: () => void) {
   const { token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -162,20 +162,27 @@ export function useChat() {
       setConfirmation(null);
       setIsLoading(true);
 
+      const timeoutId = setTimeout(() => {
+        setIsLoading(false);
+        addMessage('assistant', 'La confirmación tardó demasiado. Intenta de nuevo.');
+      }, 30000);
+
       try {
         const result = await api.chat.confirm(token, confirmation.temp_id);
+        clearTimeout(timeoutId);
         if (result.type === 'error') {
           addMessage('assistant', `Error: ${result.content}`);
         } else {
           addMessage('assistant', result.content);
-          window.dispatchEvent(new CustomEvent('capi:data-changed'));
+          onDataChange?.();
         }
       } catch {
+        clearTimeout(timeoutId);
         addMessage('assistant', 'Error al confirmar la operación.');
       }
       setIsLoading(false);
     },
-    [confirmation, token, addMessage],
+    [confirmation, token, addMessage, onDataChange],
   );
 
   const loadHistory = useCallback(async () => {

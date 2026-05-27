@@ -6,7 +6,11 @@ import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { ConfirmationCard } from './ConfirmationCard';
 
-export function ChatWidget() {
+interface ChatWidgetProps {
+  onDataChange?: () => void;
+}
+
+export function ChatWidget({ onDataChange }: ChatWidgetProps) {
   const {
     isOpen,
     toggleOpen,
@@ -17,7 +21,7 @@ export function ChatWidget() {
     confirmAction,
     clearHistory,
     stopStreaming,
-  } = useChat();
+  } = useChat(onDataChange);
 
   return (
     <>
