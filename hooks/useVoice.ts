@@ -6,6 +6,7 @@ export function useVoice() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMicSupported, setIsMicSupported] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -13,32 +14,62 @@ export function useVoice() {
     setIsSpeechSupported(!!window.speechSynthesis);
   }, []);
 
+  const clearMicError = useCallback(() => setMicError(null), []);
+
   const startListening = useCallback((onResult: (text: string) => void) => {
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognitionAPI) return;
+    if (!SpeechRecognitionAPI) {
+      setMicError('API de voz no disponible en este navegador');
+      return;
+    }
+
+    setMicError(null);
 
     const recognition = new SpeechRecognitionAPI();
     recognition.lang = 'es-CO';
-    recognition.interimResults = false;
-    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.continuous = true;
 
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      onResult(transcript);
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          const transcript = event.results[i][0].transcript;
+          if (transcript.trim()) {
+            onResult(transcript);
+          }
+        }
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      const reasons: Record<string, string> = {
+        'not-allowed': 'Permiso del micrófono denegado. Permítelo en la configuración del navegador.',
+        'no-speech': 'No se detectó audio. Intenta hablar más cerca del micrófono.',
+        'aborted': 'Grabación cancelada.',
+        'audio-capture': 'No se encontró micrófono. Conecta uno e intenta de nuevo.',
+        'network': 'Error de red al procesar el audio.',
+        'service-not-allowed': 'Servicio de voz no permitido.',
+      };
+      setMicError(reasons[event.error] || `Error de micrófono: ${event.error}`);
+      setIsListening(false);
     };
 
     recognition.onend = () => setIsListening(false);
-    recognition.onerror = () => setIsListening(false);
 
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
+    try {
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsListening(true);
+    } catch (e: any) {
+      setMicError(`Error al iniciar el micrófono: ${e.message}`);
+    }
   }, []);
 
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop();
     recognitionRef.current = null;
     setIsListening(false);
+    setMicError(null);
   }, []);
 
   const speak = useCallback((text: string) => {
@@ -65,5 +96,5 @@ export function useVoice() {
     setIsSpeaking(false);
   }, []);
 
-  return { isListening, isSpeaking, isMicSupported, isSpeechSupported, startListening, stopListening, speak, stopSpeaking };
+  return { isListening, isSpeaking, isMicSupported, isSpeechSupported, micError, startListening, stopListening, speak, stopSpeaking, clearMicError };
 }

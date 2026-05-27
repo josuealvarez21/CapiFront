@@ -12,7 +12,7 @@ interface ChatInputProps {
 export function ChatInput({ onSend, onStop, isLoading }: ChatInputProps) {
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const { isListening, isMicSupported, startListening, stopListening } = useVoice();
+  const { isListening, isMicSupported, micError, startListening, stopListening, clearMicError } = useVoice();
 
   useEffect(() => {
     if (!isLoading && inputRef.current) {
@@ -46,7 +46,14 @@ export function ChatInput({ onSend, onStop, isLoading }: ChatInputProps) {
   };
 
   return (
-    <div className="flex items-end gap-2">
+    <div className="flex flex-col gap-1">
+      {micError && (
+        <div className="flex items-center gap-1.5 rounded-lg bg-red-900/40 px-3 py-1.5 text-xs text-red-300">
+          <span>{micError}</span>
+          <button onClick={clearMicError} className="ml-auto text-red-400 hover:text-red-200">&times;</button>
+        </div>
+      )}
+      <div className="flex items-end gap-2">
       <textarea
         ref={inputRef}
         value={input}
@@ -87,6 +94,7 @@ export function ChatInput({ onSend, onStop, isLoading }: ChatInputProps) {
           <Send size={16} />
         </button>
       )}
+      </div>
     </div>
   );
 }
