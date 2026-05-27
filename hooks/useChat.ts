@@ -168,6 +168,7 @@ export function useChat() {
           addMessage('assistant', `Error: ${result.content}`);
         } else {
           addMessage('assistant', result.content);
+          window.dispatchEvent(new CustomEvent('capi:data-changed'));
         }
       } catch {
         addMessage('assistant', 'Error al confirmar la operación.');
