@@ -277,6 +277,22 @@ export const api = {
       return res.json();
     },
 
+    speak: async (token: string, text: string): Promise<Blob> => {
+      const res = await fetch(`${API_BASE}/api/v1/chat/speak`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Error ${res.status}`);
+      }
+      return res.blob();
+    },
+
     clear: (token: string) =>
       apiRequest<void>('/api/v1/chat/history', { method: 'DELETE', token }),
   },

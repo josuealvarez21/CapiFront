@@ -6,6 +6,48 @@ import { webmToWav } from '@/lib/audio';
 
 const SPANISH_LOCALES = ['es-ES', 'es-MX', 'es-US', 'es-AR', 'es-CO', 'es-CL', 'es'];
 
+function normalizeForSpeech(text: string): string {
+  let t = text;
+
+  // Strip Markdown formatting
+  t = t.replace(/\*\*(.+?)\*\*/g, '$1');
+  t = t.replace(/\*(.+?)\*/g, '$1');
+  t = t.replace(/__(.+?)__/g, '$1');
+  t = t.replace(/`(.+?)`/g, '$1');
+  t = t.replace(/~~(.+?)~~/g, '$1');
+  t = t.replace(/\[(.+?)\]\(.+?\)/g, '$1');
+  t = t.replace(/#{1,6}\s/g, '');
+  t = t.replace(/^[-*+]\s/gm, '');
+
+  // Currency: COP 25.000 → 25000 pesos colombianos
+  t = t.replace(/\bCOP\s*(\d[\d.,]*)/gi, (_, num) => `${cleanNumber(num)} pesos colombianos`);
+
+  // Currency: $25.000 or $25,000 → 25000 pesos
+  t = t.replace(/\$\s*(\d[\d.,]*)/g, (_, num) => `${cleanNumber(num)} pesos`);
+
+  // Thousands separators: 25.000 → 25000, 25,000 → 25000
+  t = t.replace(/(\d+)\.(\d{3})(?!\d)/g, (_, a, b) => a + b);
+  t = t.replace(/(\d+),(\d{3})(?!\d)/g, (_, a, b) => a + b);
+
+  // Percentages: 25% → 25 por ciento
+  t = t.replace(/(\d+(?:[.,]\d+)?)\s*%/g, '$1 por ciento');
+
+  // Informal thousands: 25k → 25 mil
+  t = t.replace(/\b(\d+)\s*k\b/gi, '$1 mil');
+
+  // Clean up whitespace
+  t = t.replace(/\s+/g, ' ').trim();
+
+  return t;
+}
+
+function cleanNumber(num: string): string {
+  let n = num.replace(/\.(\d{3})/g, (_, d) => d);
+  n = n.replace(/,(\d{3})/g, (_, d) => d);
+  n = n.replace(/,(\d{1,2})$/, '.$1');
+  return n;
+}
+
 export function useVoice() {
   const { token } = useAuth();
   const [isListening, setIsListening] = useState(false);
@@ -17,6 +59,7 @@ export function useVoice() {
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     setIsMicSupported(!!navigator.mediaDevices?.getUserMedia);
@@ -36,6 +79,7 @@ export function useVoice() {
       if (window.speechSynthesis) {
         window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
       }
+      audioRef.current?.pause();
     };
   }, []);
 
@@ -126,11 +170,44 @@ export function useVoice() {
     setMicError(null);
   }, []);
 
-  const speak = useCallback((text: string) => {
-    if (!window.speechSynthesis) return;
+  const speak = useCallback(async (text: string) => {
+    window.speechSynthesis?.cancel();
+    audioRef.current?.pause();
+    audioRef.current = null;
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
+    const normalized = normalizeForSpeech(text);
+
+    // Deepgram TTS (mejor calidad)
+    if (token) {
+      try {
+        setIsSpeaking(true);
+        const audioBlob = await api.chat.speak(token, normalized);
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        audioRef.current = audio;
+
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+          audioRef.current = null;
+          setIsSpeaking(false);
+        };
+        audio.onerror = () => {
+          URL.revokeObjectURL(audioUrl);
+          audioRef.current = null;
+          setIsSpeaking(false);
+        };
+
+        await audio.play();
+        return;
+      } catch {
+        audioRef.current = null;
+        // fallback a browser TTS
+      }
+    }
+
+    // Browser TTS fallback
+    if (!window.speechSynthesis) return;
+    const utterance = new SpeechSynthesisUtterance(normalized);
     utterance.lang = 'es-ES';
     utterance.rate = 0.9;
     utterance.pitch = 1.0;
@@ -145,10 +222,12 @@ export function useVoice() {
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
     window.speechSynthesis.speak(utterance);
-  }, []);
+  }, [token]);
 
   const stopSpeaking = useCallback(() => {
-    window.speechSynthesis.cancel();
+    window.speechSynthesis?.cancel();
+    audioRef.current?.pause();
+    audioRef.current = null;
     setIsSpeaking(false);
   }, []);
 
