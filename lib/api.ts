@@ -264,7 +264,7 @@ export const api = {
 
     transcribe: async (token: string, audioBlob: Blob): Promise<{ text: string }> => {
       const formData = new FormData();
-      formData.append('file', audioBlob, 'recording.webm');
+      formData.append('file', audioBlob, 'recording.wav');
       const res = await fetch(`${API_BASE}/api/v1/chat/transcribe`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },

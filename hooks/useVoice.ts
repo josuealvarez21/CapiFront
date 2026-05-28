@@ -1,25 +1,25 @@
 'use client';
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { api } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+import { webmToWav } from '@/lib/audio';
 
 const SPANISH_LOCALES = ['es-ES', 'es-MX', 'es-US', 'es-AR', 'es-CO', 'es-CL', 'es'];
 
-const SpeechRecognitionAPI =
-  typeof window !== 'undefined'
-    ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    : null;
-
 export function useVoice() {
+  const { token } = useAuth();
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMicSupported, setIsMicSupported] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
-  const recognitionRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
-  const onResultRef = useRef<((text: string) => void) | null>(null);
 
   useEffect(() => {
-    setIsMicSupported(!!SpeechRecognitionAPI);
+    setIsMicSupported(!!navigator.mediaDevices?.getUserMedia);
     setIsSpeechSupported(!!window.speechSynthesis);
   }, []);
 
@@ -49,49 +49,79 @@ export function useVoice() {
 
   const clearMicError = useCallback(() => setMicError(null), []);
 
-  const startListening = useCallback((onResult: (text: string) => void) => {
-    if (!SpeechRecognitionAPI) {
-      setMicError('Reconocimiento de voz no soportado en este navegador.');
+  const startListening = useCallback(async (onResult: (text: string) => void) => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setMicError('Micrófono no soportado en este navegador.');
       return;
     }
 
     setMicError(null);
-    onResultRef.current = onResult;
+    chunksRef.current = [];
 
-    const recognition = new SpeechRecognitionAPI();
-    recognition.lang = 'es-CO';
-    recognition.interimResults = false;
-    recognition.continuous = false;
-    recognition.maxAlternatives = 1;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
 
-    recognition.onresult = (event: any) => {
-      const text = event.results[0][0].transcript;
-      if (text && onResultRef.current) {
-        onResultRef.current(text);
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/webm';
+
+      const recorder = new MediaRecorder(stream, { mimeType });
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        const webmBlob = new Blob(chunksRef.current, { type: mimeType });
+        stream.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+
+        if (!token) {
+          setMicError('Debes iniciar sesión para usar voz.');
+          return;
+        }
+
+        try {
+          const wavBlob = await webmToWav(webmBlob);
+          const result = await api.chat.transcribe(token, wavBlob);
+          if (result.text) {
+            onResult(result.text);
+          }
+        } catch (e: any) {
+          setMicError(e.message || 'Error al transcribir el audio.');
+        }
+      };
+
+      recorder.onerror = () => {
+        setMicError('Error al grabar. Intenta de nuevo.');
+        stream.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+        setIsListening(false);
+      };
+
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsListening(true);
+    } catch (e: any) {
+      if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+        setMicError('Permiso del micrófono denegado.');
+      } else if (e.name === 'NotFoundError') {
+        setMicError('No se encontró micrófono.');
+      } else {
+        setMicError(`Error: ${e.message}`);
       }
-    };
-
-    recognition.onerror = (event: any) => {
-      setMicError(`Error: ${event.error}`);
-      setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
-  }, []);
+    }
+  }, [token]);
 
   const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch {}
-      recognitionRef.current = null;
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    } else {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
     }
+    mediaRecorderRef.current = null;
     setIsListening(false);
     setMicError(null);
   }, []);
