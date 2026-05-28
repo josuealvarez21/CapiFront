@@ -3,6 +3,8 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
+const SPANISH_LOCALES = ['es-ES', 'es-MX', 'es-US', 'es-AR', 'es-CO', 'es-CL', 'es'];
+
 export function useVoice() {
   const { token } = useAuth();
   const [isListening, setIsListening] = useState(false);
@@ -13,11 +15,36 @@ export function useVoice() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
 
   useEffect(() => {
     setIsMicSupported(!!navigator.mediaDevices?.getUserMedia);
     setIsSpeechSupported(!!window.speechSynthesis);
   }, []);
+
+  useEffect(() => {
+    const loadVoices = () => {
+      const v = window.speechSynthesis?.getVoices();
+      if (v && v.length > 0) voicesRef.current = v;
+    };
+    loadVoices();
+    if (window.speechSynthesis) {
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    }
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      }
+    };
+  }, []);
+
+  function findSpanishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
+    for (const locale of SPANISH_LOCALES) {
+      const found = voices.find((v) => v.lang === locale);
+      if (found) return found;
+    }
+    return voices.find((v) => v.lang.startsWith('es'));
+  }
 
   const clearMicError = useCallback(() => setMicError(null), []);
 
@@ -103,11 +130,13 @@ export function useVoice() {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'es-ES';
-    utterance.rate = 1.0;
+    utterance.rate = 0.9;
     utterance.pitch = 1.0;
 
-    const voices = window.speechSynthesis.getVoices();
-    const spanishVoice = voices.find((v) => v.lang.startsWith('es'));
+    const voices = voicesRef.current.length > 0
+      ? voicesRef.current
+      : window.speechSynthesis.getVoices();
+    const spanishVoice = findSpanishVoice(voices);
     if (spanishVoice) utterance.voice = spanishVoice;
 
     utterance.onstart = () => setIsSpeaking(true);
