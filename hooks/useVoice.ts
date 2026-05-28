@@ -86,8 +86,8 @@ export function useVoice() {
           if (result.text) {
             onResult(result.text);
           }
-        } catch {
-          setMicError('Error al transcribir el audio. Intenta de nuevo.');
+        } catch (e: any) {
+          setMicError(e.message || 'Error al transcribir el audio. Intenta de nuevo.');
         }
       };
 
