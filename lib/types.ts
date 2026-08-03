@@ -65,10 +65,19 @@ export type ModalMovementType = 'ambos' | 'ingreso' | 'gasto';
 export type SavingsDistributionMode = 'equitativa' | 'prioridad';
 
 // --- Admin Types ---
+export interface RegistroFechaItem {
+  fecha: string;
+  usuarios: number;
+}
+
 export interface AdminStats {
   total_usuarios: number;
+  usuarios_gratuito: number;
+  usuarios_premium: number;
   usuarios_admin: number;
-  total_movimientos: number;
+  nuevos_usuarios_7d: number;
+  nuevos_usuarios_30d: number;
+  registro_por_fecha: RegistroFechaItem[];
 }
 
 export interface AdminUserListItem {

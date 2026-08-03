@@ -80,7 +80,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       fetchUser(newToken);
 
       setTimeout(() => {
-        router.replace('/');
+        if (payload?.rol === 'admin') {
+          router.replace('/admin');
+        } else {
+          router.replace('/');
+        }
       }, 10);
     } catch (err) {
       console.error('Error saving token:', err);

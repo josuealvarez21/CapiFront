@@ -45,12 +45,6 @@ export default function AdminSidebar() {
 
       <div className="p-4 space-y-2 mb-4">
         <button
-          onClick={() => router.push('/')}
-          className="w-full flex items-center gap-4 px-5 py-4 text-gray-500 hover:bg-[#2e2e2e] hover:text-white rounded-xl font-medium transition-colors"
-        >
-          <ArrowLeft size={22} /> Volver a Cápi
-        </button>
-        <button
           onClick={logout}
           className="w-full flex items-center gap-4 px-5 py-4 text-red-500 hover:bg-red-500/10 rounded-xl font-black transition-colors"
         >
