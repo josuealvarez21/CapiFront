@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Cápi — Landing (Persuade)
+   THESIS:      El caos doméstico pasa a ser una decisión clara.
+   OWN-WORLD:   Bóveda financiera oscura heredada de CapiFront.
+                Lienzo zinc profundo + acentos con rol semántico:
+                balance=azul, ingresos=verde, gastos=rojo,
+                metas=ámbar, límites=lila. Sin gradientes de texto,
+                sin glass decorativo, sin glow de halo.
+   STORY:       1) ves la prueba (dashboard real) 2) entiendes que la
+                IA registra, categoriza y proyecta 3) un solo CTA gratis.
+   FIRST VIEWPORT: H1 + screenshot real en marco, rejilla de fondo tenue,
+                único momento animado (revelado del panel).
+   FORM:        Una página, 5 secciones, columna cómoda, nav sticky,
+                CTA duplicado en footer.
+   ============================================================ */
+
+@theme {
+  /* Cápi — paleta heredada de la app (sin esmeralda el arco) */
+  --color-ca-canvas: #0a0a0a;
+  --color-ca-surface: #121212;
+  --color-ca-raised: #1e1e1e;
+  --color-ca-line: #2a2a2a;
+
+  --color-ca-balance: #22c55e;   /* ingresos / principal CTA "crecer" */
+  --color-ca-blue: #3b82f6;      /* balance / info */
+  --color-ca-red: #ef4444;       /* gastos */
+  --color-ca-amber: #f59e0b;     /* metas */
+  --color-ca-violet: #8b5cf6;    /* presupuestos / límites */
+
+  --color-ca-text: #fafafa;
+  --color-ca-muted: #9ca3af;
+
+  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+  --font-body: "Instrument Sans", system-ui, -apple-system, sans-serif;
+
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+  --radius-3xl: 2.25rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-ca-canvas text-ca-text font-body antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-ca-balance) 35%, transparent);
+    color: #fff;
+  }
+}
+
+@layer components {
+  .container-ca {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+           bg-ca-balance px-7 py-3.5 text-sm font-bold text-black
+           transition-all duration-300 hover:brightness-110
+           focus-visible:outline-2 focus-visible:outline-offset-2
+           focus-visible:outline-ca-balance active:scale-95;
+    box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 12px 24px -12px rgba(34,197,94,.5);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+           border border-ca-line px-7 py-3.5 text-sm font-semibold
+           text-ca-text transition-all duration-300
+           hover:border-ca-text/40 hover:bg-white/[0.03]
+           focus-visible:outline-2 focus-visible:outline-offset-2
+           focus-visible:outline-ca-blue;
+  }
+
+  .eyebrow {
+    @apply mb-4 inline-flex items-center gap-2 rounded-full border
+           border-ca-line bg-white/[0.02] px-4 py-1.5 text-xs font-semibold
+           uppercase tracking-[0.18em] text-ca-muted;
+  }
+
+  .heading {
+    @apply font-display font-extrabold leading-[1.04] tracking-[-0.03em] text-ca-text;
+  }
+
+  .lead {
+    @apply text-base leading-relaxed text-ca-muted sm:text-lg;
+  }
+
+  /* Suave reveal — un momento de movimiento, no sección a sección */
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+
+/* Scrollbar fina del proyecto */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 999px;
+  border: 2px solid #0a0a0a;
+}
+::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
