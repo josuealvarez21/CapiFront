@@ -32,7 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-[#121212] text-white flex font-sans">
       <AdminSidebar />
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 pb-24 md:pb-10 bg-gradient-to-b from-[#1a1a2e] to-[#121212]">
+      <main className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 pb-24 md:pb-6 bg-gradient-to-b from-[#1a1a2e] to-[#121212]">
         {children}
       </main>
     </div>

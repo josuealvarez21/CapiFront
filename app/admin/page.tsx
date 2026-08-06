@@ -29,15 +29,15 @@ function StatsCard({
   subtitle?: string;
 }) {
   return (
-    <div className="bg-[#1e1e1e] border border-[#2e2e2e] rounded-3xl p-6 shadow-xl hover:border-purple-500/30 transition-all">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-[#1e1e1e] border border-[#2e2e2e] rounded-2xl p-4 min-h-[30px] flex flex-col justify-center shadow-lg hover:border-purple-500/30 transition-all">
+      <div className="flex items-center justify-between mb-2">
         <p className="text-gray-400 text-sm font-medium">{label}</p>
-        <div className={`p-3 rounded-2xl ${color}`}>
-          <Icon size={22} className="text-white" />
+        <div className={`p-2 rounded-xl ${color}`}>
+          <Icon size={18} className="text-white" />
         </div>
       </div>
       <p className="text-3xl font-extrabold text-white">{value}</p>
-      {subtitle && <p className="text-xs text-gray-500 mt-2 font-medium">{subtitle}</p>}
+      {subtitle && <p className="text-xs text-gray-500 mt-1 font-medium">{subtitle}</p>}
     </div>
   );
 }
@@ -76,18 +76,18 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <header>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-2 tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-1 tracking-tight">
           Panel de Administración
         </h2>
-        <p className="text-gray-400 text-sm sm:text-lg">
+        <p className="text-gray-400 text-sm sm:text-base">
           Métricas clave de usuarios y gráfico de registro de la plataforma
         </p>
       </header>
 
       {/* Tarjetas Indicadoras Clave */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           icon={Users}
           label="Total de Usuarios"
@@ -119,20 +119,20 @@ export default function AdminDashboard() {
       </div>
 
       {/* Desglose de Planes y Gráfico de Registro */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Gráfico de Crecimiento de Usuarios (Recharts) */}
-        <div className="lg:col-span-2 bg-[#1e1e1e] border border-[#2e2e2e] rounded-3xl p-6 sm:p-8 shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
+        <div className="lg:col-span-2 bg-[#1e1e1e] border border-[#2e2e2e] rounded-3xl p-4 sm:p-6 shadow-lg">
+          <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="text-xl font-bold text-white">Crecimiento de Nuevos Usuarios</h3>
-              <p className="text-sm text-gray-400">Registros por día en los últimos 14 días</p>
+              <h3 className="text-lg font-bold text-white">Crecimiento de Nuevos Usuarios</h3>
+              <p className="text-xs text-gray-400">Registros por día en los últimos 14 días</p>
             </div>
-            <div className="p-2 bg-[#8b5cf6]/10 text-[#8b5cf6] rounded-xl font-medium text-xs border border-[#8b5cf6]/20">
+            <div className="p-1.5 bg-[#8b5cf6]/10 text-[#8b5cf6] rounded-lg font-medium text-xs border border-[#8b5cf6]/20">
               En tiempo real
             </div>
           </div>
 
-          <div className="h-72 w-full">
+          <div className="h-52 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -169,16 +169,16 @@ export default function AdminDashboard() {
         </div>
 
         {/* Resumen por Plan de Pago / Rol */}
-        <div className="bg-[#1e1e1e] border border-[#2e2e2e] rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col justify-between">
+        <div className="bg-[#1e1e1e] border border-[#2e2e2e] rounded-3xl p-4 sm:p-6 shadow-lg flex flex-col justify-between">
           <div>
-            <h3 className="text-xl font-bold text-white mb-2">Distribución de Planes</h3>
-            <p className="text-sm text-gray-400 mb-6">Desglose de usuarios según su membresía</p>
+            <h3 className="text-lg font-bold text-white mb-2">Distribución de Planes</h3>
+            <p className="text-xs text-gray-400 mb-4">Desglose de usuarios según su membresía</p>
 
-            <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-[#121212] border border-[#2e2e2e] flex items-center justify-between">
+            <div className="space-y-3">
+              <div className="p-3 rounded-2xl bg-[#121212] border border-[#2e2e2e] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
-                    <UserCheck size={20} />
+                  <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+                    <UserCheck size={18} />
                   </div>
                   <div>
                     <p className="text-white font-bold text-sm">Plan Gratuito</p>
@@ -188,10 +188,10 @@ export default function AdminDashboard() {
                 <span className="text-xl font-extrabold text-white">{stats.usuarios_gratuito}</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-[#121212] border border-[#2e2e2e] flex items-center justify-between">
+              <div className="p-3 rounded-2xl bg-[#121212] border border-[#2e2e2e] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400">
-                    <Star size={20} />
+                  <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
+                    <Star size={18} />
                   </div>
                   <div>
                     <p className="text-white font-bold text-sm">Cápi Pro</p>
@@ -201,10 +201,10 @@ export default function AdminDashboard() {
                 <span className="text-xl font-extrabold text-white">{stats.usuarios_premium}</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-[#121212] border border-[#2e2e2e] flex items-center justify-between">
+              <div className="p-3 rounded-2xl bg-[#121212] border border-[#2e2e2e] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400">
-                    <Shield size={20} />
+                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+                    <Shield size={18} />
                   </div>
                   <div>
                     <p className="text-white font-bold text-sm">Administradores</p>
