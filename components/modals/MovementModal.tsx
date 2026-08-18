@@ -50,13 +50,13 @@ export default function MovementModal({
             required
             value={formData.id_categoria}
             onChange={(e) => setFormData({ ...formData, id_categoria: e.target.value })}
-            className="w-full bg-[#121212] border-2 border-[#2e2e2e] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6] hover:border-gray-600 transition-colors appearance-none font-medium"
+            className="w-full bg-[#0a0e17] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6] hover:border-gray-500 transition-colors appearance-none font-medium [color-scheme:dark]"
           >
-            <option value="" disabled>
+            <option value="" disabled className="bg-[#0a0e17] text-white">
               Elige la naturaleza de la cuenta
             </option>
             {categoriesFiltered.map((cat) => (
-              <option key={cat.id_categoria} value={cat.id_categoria}>
+              <option key={cat.id_categoria} value={cat.id_categoria} className="bg-[#0a0e17] text-white">
                 {cat.tipo === 'ingreso' ? '🟢' : '🔴'} {cat.nombre_categoria}
               </option>
             ))}
@@ -77,7 +77,7 @@ export default function MovementModal({
               onChange={(e) =>
                 setFormData({ ...formData, monto: e.target.value.replace(/\D/g, '') })
               }
-              className="w-full bg-[#121212] border-2 border-[#2e2e2e] focus:border-[#3b82f6] rounded-2xl py-5 pl-10 pr-6 text-white text-3xl font-black outline-none transition-all placeholder:text-gray-800"
+              className="w-full bg-white/5 border border-white/10 focus:border-[#3b82f6] rounded-2xl py-5 pl-10 pr-6 text-white text-3xl font-black outline-none transition-all placeholder:text-gray-700"
               required
             />
           </div>
@@ -91,7 +91,7 @@ export default function MovementModal({
             required
             value={formData.descripcion}
             onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-            className="w-full bg-[#121212] border-2 border-[#2e2e2e] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6] hover:border-gray-600 transition-colors placeholder-gray-700 font-medium"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6] hover:border-gray-500 transition-colors placeholder-gray-700 font-medium"
             placeholder="Descripción del movimiento..."
           />
         </div>
@@ -104,13 +104,13 @@ export default function MovementModal({
             required
             value={formData.fecha}
             onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-            className="w-full bg-[#121212] border-2 border-[#2e2e2e] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6] hover:border-gray-600 transition-colors [color-scheme:dark] font-medium"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6] hover:border-gray-500 transition-colors [color-scheme:dark] font-medium"
           />
         </div>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-gradient-to-r from-[#3b82f6] to-[#2563eb] hover:from-[#2563eb] hover:to-[#1d4ed8] text-white py-4 rounded-xl font-extrabold text-lg mt-6 transition-all duration-300 disabled:opacity-50 shadow-lg shadow-blue-900/30"
+          className="w-full bg-gradient-to-r from-[#3b82f6] to-[#22c55e] hover:from-[#2563eb] hover:to-[#16a34a] text-white py-4 rounded-xl font-extrabold text-lg mt-6 transition-all duration-300 disabled:opacity-50 shadow-lg shadow-blue-900/30"
         >
           {isSubmitting ? 'Encriptando...' : 'Confirmar Envio'}
         </button>

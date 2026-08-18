@@ -74,11 +74,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05),transparent_50%)]">
+    <div className="min-h-screen bg-[#090d16] relative overflow-hidden flex items-center justify-center p-6">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[#22c55e] opacity-20 blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-[#3b82f6] opacity-20 blur-3xl" />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[440px] bg-[#121212] border border-[#1e1e1e] rounded-[32px] p-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] relative overflow-hidden group"
+        className="w-full max-w-[440px] glass-card rounded-[32px] p-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] relative overflow-hidden group"
       >
         {/* Glow Effects */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full group-hover:bg-blue-500/20 transition-colors duration-700"></div>
@@ -137,7 +141,7 @@ export default function LoginPage() {
                   });
                 }}
                 placeholder="tu@correo.com"
-                className="w-full bg-[#181818] border border-[#2e2e2e] focus:border-[#3b82f6] focus:ring-4 focus:ring-blue-500/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none transition-all placeholder:text-gray-700 font-medium"
+                className="w-full bg-white/5 border border-white/10 focus:border-[#3b82f6] focus:ring-4 focus:ring-blue-500/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none transition-all placeholder:text-gray-700 font-medium"
               />
               {errores.email && (
                 <p className="text-red-400 text-xs mt-1 ml-1">{errores.email}</p>
@@ -188,7 +192,7 @@ export default function LoginPage() {
                   });
                 }}
                 placeholder="••••••••"
-                className="w-full bg-[#181818] border border-[#2e2e2e] focus:border-[#3b82f6] focus:ring-4 focus:ring-blue-500/10 rounded-2xl py-4 pl-12 pr-12 text-white outline-none transition-all placeholder:text-gray-700 font-medium"
+                className="w-full bg-white/5 border border-white/10 focus:border-[#3b82f6] focus:ring-4 focus:ring-blue-500/10 rounded-2xl py-4 pl-12 pr-12 text-white outline-none transition-all placeholder:text-gray-700 font-medium"
               />
               <button
                 type="button"
@@ -218,10 +222,10 @@ export default function LoginPage() {
         <div className="mt-8 flex flex-col gap-4">
           <div className="relative py-2">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#1e1e1e]"></div>
+              <div className="w-full border-t border-white/10"></div>
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-[#121212] px-4 text-[10px] font-black text-gray-600 uppercase tracking-[2px]">
+              <span className="bg-[#0f172a]/70 px-4 text-[10px] font-black text-gray-600 uppercase tracking-[2px]">
                 O continúa con
               </span>
             </div>

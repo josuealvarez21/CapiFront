@@ -63,20 +63,20 @@ export default function SavingsPlanner({
   };
 
   return (
-    <div className="bg-[#1e1e1e] border border-[#2e2e2e] rounded-3xl p-8 mb-10 shadow-2xl relative overflow-hidden">
-      <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-[#f59e0b] opacity-5 pointer-events-none" />
+    <div className="glass-card rounded-3xl p-6 mb-8 relative overflow-hidden">
+      <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-[#3b82f6] opacity-5 pointer-events-none" />
 
-      <div className="flex flex-col lg:flex-row justify-between items-start gap-8 relative z-10">
+      <div className="flex flex-col lg:flex-row justify-between items-start gap-6 relative z-10">
         <div className="max-w-md">
-          <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
-            <Target className="text-[#f59e0b]" /> Planificador de Inversión
+          <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-3">
+            <Target className="text-[#3b82f6]" /> Planificador de Inversión
           </h3>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-400 text-sm mb-5">
             Optimiza cómo crece tu dinero. Elige un porcentaje o un monto exacto y decide cómo
             distribuirlo entre tus metas.
           </p>
 
-          <div className="flex gap-2 p-1 bg-[#121212] rounded-xl border border-[#2e2e2e] mb-4">
+          <div className="flex gap-2 p-1 glass-soft rounded-xl border border-white/10 mb-4">
             <button
               onClick={() => setSavingsDistributionMode('equitativa')}
               className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${savingsDistributionMode === 'equitativa' ? 'bg-[#3b82f6] text-white shadow-lg shadow-blue-900/20' : 'text-gray-500 hover:text-white'}`}
@@ -85,7 +85,7 @@ export default function SavingsPlanner({
             </button>
             <button
               onClick={() => setSavingsDistributionMode('prioridad')}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${savingsDistributionMode === 'prioridad' ? 'bg-[#f59e0b] text-white shadow-lg shadow-yellow-900/20' : 'text-gray-500 hover:text-white'}`}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${savingsDistributionMode === 'prioridad' ? 'bg-[#22c55e] text-[#090d16] shadow-lg shadow-green-900/20' : 'text-gray-500 hover:text-white'}`}
             >
               Por Prioridad
             </button>
@@ -97,14 +97,14 @@ export default function SavingsPlanner({
           </p>
         </div>
 
-        <div className="flex-1 w-full bg-[#121212] p-6 rounded-2xl border border-[#2e2e2e]">
+        <div className="flex-1 w-full glass-soft p-5 rounded-2xl border border-white/10">
           <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
             <div className="flex-1">
               <div className="flex justify-between mb-2">
                 <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">
                   Porcentaje de Balance
                 </span>
-                <span className="text-[#f59e0b] font-extrabold">{savingsPercentage}%</span>
+                <span className="text-[#4ade80] font-extrabold">{savingsPercentage}%</span>
               </div>
               <input
                 type="range"
@@ -115,7 +115,7 @@ export default function SavingsPlanner({
                   setSavingsPercentage(parseInt(e.target.value));
                   setManualSavingsAmount('');
                 }}
-                className="w-full h-1.5 bg-[#1e1e1e] rounded-lg appearance-none cursor-pointer accent-[#f59e0b]"
+                className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#22c55e]"
               />
             </div>
             <div className="w-full sm:w-48">
@@ -132,13 +132,13 @@ export default function SavingsPlanner({
                   setManualSavingsAmount(e.target.value);
                   setSavingsPercentage(0);
                 }}
-                className="w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#f59e0b]"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#22c55e]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-[#1e1e1e] p-4 rounded-xl border border-[#2e2e2e]">
+            <div className="glass-soft p-4 rounded-xl border border-white/10">
               <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">
                 Balance Disponible
               </p>
@@ -146,17 +146,17 @@ export default function SavingsPlanner({
                 {formatCurrency(data.summary.balance_total)}
               </p>
             </div>
-            <div className="bg-[#1e1e1e] p-4 rounded-xl border border-[#f59e0b] bg-opacity-10">
-              <p className="text-[10px] text-[#f59e0b] uppercase font-bold mb-1">
+            <div className="glass-soft p-4 rounded-xl border border-[#22c55e]/40 bg-[#22c55e]/5">
+              <p className="text-[10px] text-[#4ade80] uppercase font-bold mb-1">
                 Total a Invertir
               </p>
-              <p className="text-md font-bold text-[#f59e0b]">
+              <p className="text-md font-bold text-[#4ade80]">
                 {formatCurrency(totalToDistribute)}
               </p>
             </div>
             <button
               onClick={handleExecutePlan}
-              className="bg-[#f59e0b] hover:bg-yellow-500 text-black font-extrabold rounded-xl transition-all shadow-lg shadow-yellow-900/20 flex items-center justify-center gap-2"
+              className="bg-[#22c55e] hover:bg-[#16a34a] text-[#090d16] font-extrabold rounded-xl transition-all shadow-lg shadow-green-900/30 flex items-center justify-center gap-2"
             >
               <PlusCircle size={18} /> Ejecutar Plan
             </button>

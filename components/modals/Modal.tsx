@@ -14,10 +14,10 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-6 animate-in fade-in duration-200">
-      <div className="bg-[#1e1e1e] border border-[#2e2e2e] rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-[0_0_50px_rgba(0,0,0,0.5)] relative max-h-[90vh] flex flex-col">
+      <div className="glass-card rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-[0_0_80px_-20px_rgba(0,0,0,0.9)] relative max-h-[90vh] flex flex-col">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-white transition bg-[#121212] p-2 rounded-full border border-[#2e2e2e] z-10"
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-white transition glass-soft p-2 rounded-full border border-white/10 z-10"
         >
           <X size={20} />
         </button>

@@ -29,13 +29,17 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 bg-[radial-gradient(circle_at_50%_50%,rgba(139,92,246,0.05),transparent_50%)]">
+    <div className="min-h-screen bg-[#090d16] relative overflow-hidden flex items-center justify-center p-6">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[#3b82f6] opacity-20 blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-[#22c55e] opacity-20 blur-3xl" />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[440px] bg-[#121212] border border-[#1e1e1e] rounded-[32px] p-10 shadow-2xl relative overflow-hidden"
+        className="w-full max-w-[440px] glass-card rounded-[32px] p-10 shadow-2xl relative overflow-hidden"
       >
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-purple-500/10 blur-[80px] rounded-full"></div>
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#3b82f6]/10 blur-[80px] rounded-full"></div>
 
         <div className="relative z-10 text-center mb-10">
           <Link
@@ -45,7 +49,7 @@ export default function ForgotPasswordPage() {
             <ArrowLeft size={16} /> Volver al Inicio
           </Link>
 
-          <div className="w-20 h-20 bg-gradient-to-br from-[#8b5cf6] to-[#6d28d9] rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-2xl shadow-purple-500/20">
+          <div className="w-20 h-20 bg-gradient-to-br from-[#3b82f6] to-[#22c55e] rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-2xl shadow-blue-500/20">
             <Key size={40} className="text-white" />
           </div>
           <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Recuperar Acceso</h1>
@@ -75,7 +79,7 @@ export default function ForgotPasswordPage() {
                 Tu Correo Registrado
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-600 group-focus-within:text-[#8b5cf6] transition-colors">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-600 group-focus-within:text-[#3b82f6] transition-colors">
                   <Mail size={20} />
                 </div>
                 <input
@@ -84,7 +88,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@correo.com"
-                  className="w-full bg-[#181818] border border-[#2e2e2e] focus:border-[#8b5cf6] focus:ring-4 focus:ring-purple-500/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none transition-all placeholder:text-gray-700 font-medium"
+                  className="w-full bg-white/5 border border-white/10 focus:border-[#3b82f6] focus:ring-4 focus:ring-blue-500/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none transition-all placeholder:text-gray-700 font-medium"
                 />
               </div>
             </div>
@@ -92,7 +96,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#8b5cf6] to-[#7c3aed] text-white py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-[#3b82f6] to-[#22c55e] text-white py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
             >
               {isLoading ? 'Enviando...' : 'Enviar Instrucciones'}
               {!isLoading && <Send size={20} />}

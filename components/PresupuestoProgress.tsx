@@ -19,7 +19,7 @@ export default function PresupuestoProgress({ presupuesto, onDelete }: Presupues
 
   return (
     <div
-      className={`mb-4 bg-[#121212] p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden group ${esExcedido ? 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.15)]' : 'border-[#2e2e2e] hover:border-[#8b5cf6]'}`}
+      className={`mb-4 glass-soft p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden group ${esExcedido ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.15)]' : 'border-white/10 hover:border-[#3b82f6]/50 hover:shadow-[0_0_30px_-10px_rgba(59,130,246,0.35)]'}`}
     >
       <div className="flex justify-between mb-4 relative z-10">
         <div className="flex flex-col">
@@ -41,7 +41,7 @@ export default function PresupuestoProgress({ presupuesto, onDelete }: Presupues
         </div>
         <button
           onClick={() => onDelete(presupuesto.id)}
-          className="text-gray-600 hover:text-red-500 transition-colors p-1"
+          className="text-gray-600 hover:text-red-400 transition-colors p-1"
         >
           <Trash2 size={18} />
         </button>
@@ -52,20 +52,20 @@ export default function PresupuestoProgress({ presupuesto, onDelete }: Presupues
         </span>
         <span className="text-gray-500 text-xs font-bold mb-1">de {formatCurrency(limite)}</span>
       </div>
-      <div className="w-full bg-[#1e1e1e] rounded-full h-3.5 border border-[#2e2e2e] overflow-hidden relative z-10 shadow-inner">
+      <div className="w-full bg-white/5 rounded-full h-3.5 border border-white/10 overflow-hidden relative z-10 shadow-inner">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(porcentaje, 100)}%` }}
-          className={`h-full transition-all duration-1000 ${esExcedido ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.6)]' : 'bg-[#8b5cf6] shadow-[0_0_15px_rgba(139,92,246,0.4)]'}`}
+          className={`h-full transition-all duration-1000 ${esExcedido ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.6)]' : 'bg-gradient-to-r from-[#3b82f6] to-[#22c55e] shadow-[0_0_15px_rgba(59,130,246,0.4)]'}`}
         />
       </div>
       <div className="mt-3 flex justify-between items-center relative z-10">
         <span
-          className={`text-[10px] font-black uppercase tracking-widest ${esExcedido ? 'text-red-500' : 'text-[#8b5cf6]'}`}
+          className={`text-[10px] font-black uppercase tracking-widest ${esExcedido ? 'text-red-500' : 'text-[#60a5fa]'}`}
         >
           {porcentaje.toFixed(1)}% Consumido
         </span>
-        {esExcedido && <TrendingUp size={14} className="text-red-500" />}
+        {esExcedido && <TrendingUp size={14} className="text-red-400" />}
       </div>
     </div>
   );
