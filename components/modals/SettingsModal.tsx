@@ -48,7 +48,7 @@ export default function SettingsModal({
               width={96}
               height={96}
               unoptimized
-              className="w-full h-full rounded-full object-cover border-4 border-[#1e1e1e]"
+              className="w-full h-full rounded-full object-cover border-4 border-[#0a0e17]"
             />
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function SettingsModal({
             type="text"
             value={profileName}
             onChange={(e) => setProfileName(e.target.value)}
-            className="w-full bg-[#121212] border-2 border-[#2e2e2e] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6]"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6]"
             placeholder="Tu nombre completo..."
           />
         </div>
@@ -77,17 +77,17 @@ export default function SettingsModal({
               setProfilePicUrl(e.target.value);
               setProfilePicFile(null);
             }}
-            className="w-full bg-[#121212] border-2 border-[#2e2e2e] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6]"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6]"
             placeholder="https://ejemplo.com/mifoto.jpg"
           />
         </div>
 
         <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#2e2e2e]" />
+            <div className="w-full border-t border-white/10" />
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-[#1e1e1e] px-4 text-[10px] font-black text-gray-500 uppercase tracking-[2px]">
+            <span className="bg-[#0a0e17] px-4 text-[10px] font-black text-gray-500 uppercase tracking-[2px]">
               O Sube un Archivo
             </span>
           </div>
@@ -103,7 +103,7 @@ export default function SettingsModal({
                 setProfilePicUrl('');
               }
             }}
-            className="w-full bg-[#121212] border-2 border-[#2e2e2e] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#3b82f6] file:text-white hover:file:bg-blue-600 cursor-pointer"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#3b82f6] file:text-white hover:file:bg-blue-600 cursor-pointer"
           />
         </div>
 

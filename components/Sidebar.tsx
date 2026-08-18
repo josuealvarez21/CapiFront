@@ -35,36 +35,36 @@ const navItems: {
     id: 'dashboard',
     label: 'Dashboard',
     icon: LayoutDashboard,
-    activeColor: 'bg-[#3b82f6] bg-opacity-30',
+    activeColor: 'bg-[#3b82f6]/20 text-[#60a5fa] border-[#3b82f6]/30',
     shadowColor: 'shadow-blue-500/10',
   },
   {
     id: 'ingresos',
     label: 'Ingresos',
     icon: TrendingUp,
-    activeColor: 'bg-[#22c55e] bg-opacity-30',
+    activeColor: 'bg-[#22c55e]/20 text-[#4ade80] border-[#22c55e]/30',
     shadowColor: 'shadow-green-500/10',
   },
   {
     id: 'gastos',
     label: 'Gastos',
     icon: TrendingDown,
-    activeColor: 'bg-[#ef4444] bg-opacity-30',
+    activeColor: 'bg-red-500/15 text-red-300 border-red-500/30',
     shadowColor: 'shadow-red-500/10',
   },
   {
     id: 'metas',
     label: 'Metas',
     icon: Target,
-    activeColor: 'bg-[#f59e0b] bg-opacity-30',
-    shadowColor: 'shadow-yellow-500/10',
+    activeColor: 'bg-[#22c55e]/20 text-[#4ade80] border-[#22c55e]/30',
+    shadowColor: 'shadow-green-500/10',
   },
   {
     id: 'presupuestos',
     label: 'Presupuestos',
     icon: Wallet,
-    activeColor: 'bg-[#8b5cf6] bg-opacity-30',
-    shadowColor: 'shadow-purple-500/10',
+    activeColor: 'bg-[#3b82f6]/20 text-[#60a5fa] border-[#3b82f6]/30',
+    shadowColor: 'shadow-blue-500/10',
   },
 ];
 
@@ -81,12 +81,10 @@ export default function Sidebar({
   const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=121212&color=fff`;
   const avatarSrc = avatarError || !user.foto_perfil ? fallbackUrl : user.foto_perfil;
   return (
-    <aside className="w-64 bg-[#1e1e1e] border-r border-[#2e2e2e] flex flex-col justify-between hidden md:flex z-10 sticky top-0 h-screen shadow-2xl">
+    <aside className="w-64 glass-soft border-r border-white/10 flex flex-col justify-between hidden md:flex z-10 sticky top-0 h-screen shadow-2xl">
       <div>
         <div className="p-6 pb-4">
-          <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#3b82f6] to-[#22c55e]">
-            Cápi
-          </h1>
+          <h1 className="text-3xl font-extrabold neon-text">Cápi</h1>
           <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest font-semibold">
             Hub Financiero
           </p>
@@ -100,7 +98,7 @@ export default function Sidebar({
               width={48}
               height={48}
               onError={() => setAvatarError(true)}
-              className="w-full h-full rounded-full object-cover border-2 border-[#1e1e1e]"
+              className="w-full h-full rounded-full object-cover border-2 border-[#0a0e17]"
             />
           </div>
           <div className="overflow-hidden">
@@ -116,8 +114,8 @@ export default function Sidebar({
               onClick={() => onTabChange(id)}
               className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-medium transition-all duration-300 ${
                 currentTab === id
-                  ? `${activeColor} text-white shadow-lg ${shadowColor}`
-                  : 'text-gray-400 hover:bg-[#2e2e2e] hover:text-white'
+                  ? `${activeColor} border shadow-lg ${shadowColor}`
+                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
               <Icon size={22} /> {label}
@@ -130,20 +128,20 @@ export default function Sidebar({
         {rol === 'admin' && (
           <button
             onClick={() => router.push('/admin')}
-            className="w-full flex items-center gap-4 px-5 py-4 text-purple-400 hover:bg-purple-500/10 rounded-xl font-medium transition-colors"
+            className="w-full flex items-center gap-4 px-5 py-4 text-[#3b82f6] hover:bg-[#3b82f6]/10 rounded-xl font-medium transition-colors"
           >
             <Shield size={22} /> Admin Panel
           </button>
         )}
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center gap-4 px-5 py-4 text-gray-500 hover:bg-[#2e2e2e] hover:text-white rounded-xl font-medium transition-colors"
+          className="w-full flex items-center gap-4 px-5 py-4 text-gray-500 hover:bg-white/5 hover:text-white rounded-xl font-medium transition-colors"
         >
           <Settings size={22} /> Ajustes
         </button>
         <button
           onClick={onLogout}
-          className="w-full flex items-center gap-4 px-5 py-4 text-red-500 hover:bg-red-500/10 rounded-xl font-black transition-colors"
+          className="w-full flex items-center gap-4 px-5 py-4 text-red-400 hover:bg-red-500/10 rounded-xl font-black transition-colors"
         >
           <LogOut size={22} /> Salir de Cápi
         </button>

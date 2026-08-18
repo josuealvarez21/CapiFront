@@ -39,14 +39,14 @@ export default function MovementsList({
       {movements.map((mov) => (
         <div
           key={mov.id}
-          className={`flex items-center justify-between bg-[#121212] ${padding} rounded-2xl border border-[#2e2e2e] hover:border-gray-700 transition-colors group`}
+          className={`flex items-center justify-between glass-soft ${padding} rounded-2xl border border-white/10 hover:border-[#3b82f6]/40 hover:bg-[#0f172a]/40 transition-all duration-300 group`}
         >
           <div className="flex items-center gap-4">
             <div
               className={`${iconPadding} rounded-xl flex-shrink-0 transition-transform group-hover:scale-110 ${
                 mov.tipo === 'ingreso'
-                  ? 'bg-[#1C542D] text-[#22c55e]'
-                  : 'bg-[#451a1a] text-[#ef4444]'
+                  ? 'bg-[#22c55e]/15 text-[#4ade80] border border-[#22c55e]/25'
+                  : 'bg-red-500/10 text-red-400 border border-red-500/20'
               }`}
             >
               {getCategoryIcon(mov.categoria)}
@@ -65,14 +65,14 @@ export default function MovementsList({
           </div>
           <div className="flex items-center gap-4">
             <span
-              className={`font-extrabold ${amountSize} ${mov.tipo === 'ingreso' ? 'text-[#22c55e]' : 'text-white'}`}
+              className={`font-extrabold ${amountSize} ${mov.tipo === 'ingreso' ? 'text-[#4ade80]' : 'text-white'}`}
             >
               {mov.tipo === 'ingreso' ? '+' : '-'}
               {formatCurrency(mov.monto)}
             </span>
             <button
               onClick={() => onDelete(mov.id)}
-              className="text-gray-500 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+              className="text-gray-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
             >
               <Trash2 size={isCompact ? 18 : 22} />
             </button>

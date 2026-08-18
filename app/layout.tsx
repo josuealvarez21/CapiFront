@@ -31,6 +31,10 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
+          <div className="absolute -top-32 -left-32 h-[34rem] w-[34rem] rounded-full bg-[#22c55e] opacity-20 blur-3xl" />
+          <div className="absolute -bottom-40 -right-32 h-[38rem] w-[38rem] rounded-full bg-[#3b82f6] opacity-20 blur-3xl" />
+        </div>
         {GOOGLE_CLIENT_ID ? (
           <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
             <AuthProvider>

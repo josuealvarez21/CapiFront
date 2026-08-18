@@ -22,7 +22,7 @@ export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: Me
 
   const isCompleted = currentActual >= target;
   const willBeCompleted = currentActual + projected >= target;
-  const color = meta.color || '#f59e0b';
+  const color = meta.color || '#3b82f6';
 
   const calculateMonthsRemaining = () => {
     if (isCompleted) return 0;
@@ -35,14 +35,14 @@ export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: Me
 
   return (
     <div
-      className={`mb-4 bg-[#121212] p-5 rounded-2xl border transition-all duration-500 relative overflow-hidden group ${isCompleted ? 'border-[#22c55e] shadow-[0_0_20px_rgba(34,197,94,0.1)]' : 'border-[#2e2e2e] hover:border-[#f59e0b]'}`}
+      className={`mb-3 glass-soft p-4 rounded-2xl border transition-all duration-500 relative overflow-hidden group ${isCompleted ? 'border-[#22c55e]/50 shadow-[0_0_25px_rgba(34,197,94,0.12)]' : 'border-white/10 hover:border-[#3b82f6]/40'}`}
     >
       <div className="flex justify-between mb-3 relative z-10">
         <div className="flex flex-col">
           <span className="text-white font-bold tracking-wide flex items-center gap-2">
             {meta.nombre}
             {isCompleted && (
-              <span className="text-[#22c55e] text-[10px] bg-[#1C542D] px-2 py-0.5 rounded-full uppercase">
+              <span className="text-[#22c55e] text-[10px] bg-[#22c55e]/15 px-2 py-0.5 rounded-full uppercase border border-[#22c55e]/25">
                 Completada
               </span>
             )}
@@ -62,28 +62,28 @@ export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: Me
           </span>
           <button
             onClick={() => onDelete(meta.id)}
-            className="text-gray-500 hover:text-red-500 transition-colors p-1"
+            className="text-gray-500 hover:text-red-400 transition-colors p-1"
           >
             <Trash2 size={16} />
           </button>
         </div>
       </div>
-      <div className="w-full bg-[#1e1e1e] rounded-full h-3 border border-[#2e2e2e] overflow-hidden mb-3 relative">
+      <div className="w-full bg-white/5 rounded-full h-3 border border-white/10 overflow-hidden mb-3 relative">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${Math.max(projectedPercentage, projectedAmount > 0 ? 1 : 0)}%` }}
-          className={`h-3 rounded-full absolute top-0 left-0 opacity-40 ${willBeCompleted ? 'bg-[#22c55e]' : 'bg-[#f59e0b]'}`}
+          className={`h-3 rounded-full absolute top-0 left-0 opacity-40 ${willBeCompleted ? 'bg-gradient-to-r from-[#3b82f6] to-[#22c55e]' : 'bg-[#3b82f6]'}`}
         />
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${Math.max(currentPercentage, meta.ahorro_actual > 0 ? 1 : 0)}%` }}
-          className={`h-3 rounded-full absolute top-0 left-0 z-10 shadow-[0_0_15px_rgba(245,158,11,0.6)] ${isCompleted ? 'bg-[#22c55e] shadow-[0_0_20px_rgba(34,197,94,0.8)]' : ''}`}
+          className={`h-3 rounded-full absolute top-0 left-0 z-10 shadow-[0_0_15px_rgba(59,130,246,0.5)] ${isCompleted ? 'bg-gradient-to-r from-[#3b82f6] to-[#22c55e] shadow-[0_0_20px_rgba(34,197,94,0.8)]' : ''}`}
           style={{ backgroundColor: !isCompleted ? color : undefined }}
         />
       </div>
       <div className="flex justify-between items-center mt-2">
         <span
-          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${willBeCompleted ? 'bg-[#22c55e]' : 'bg-[#f59e0b]'} text-[#121212]`}
+          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${willBeCompleted ? 'bg-[#22c55e] text-[#090d16]' : 'bg-[#22c55e]/15 text-[#4ade80] border border-[#22c55e]/25'}`}
         >
           {projectedPercentage < 1 && projectedPercentage > 0
             ? projectedPercentage.toFixed(2)

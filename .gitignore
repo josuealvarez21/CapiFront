@@ -25,6 +25,9 @@
 *.pem
 Thumbs.db
 
+# Documento de diseño local
+diseno.md
+
 # Debug
 npm-debug.log*
 yarn-debug.log*

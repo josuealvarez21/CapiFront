@@ -45,27 +45,27 @@ export function ConfirmationCard({ tool, args, onConfirm, onCancel }: Confirmati
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-amber-500/30 bg-zinc-800 p-3"
+      className="rounded-xl border border-amber-500/30 glass-soft p-3"
     >
       <div className="mb-2 flex items-center gap-2 text-amber-400">
         <AlertTriangle size={16} />
         <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
       </div>
-      <p className="mb-3 whitespace-pre-wrap text-sm text-zinc-200">
+      <p className="mb-3 whitespace-pre-wrap text-sm text-gray-200">
         {formatArgs(tool, args)}
       </p>
-      <p className="mb-3 text-xs text-zinc-400">¿Confirmas esta operación?</p>
+      <p className="mb-3 text-xs text-gray-500">¿Confirmas esta operación?</p>
       <div className="flex gap-2">
         <button
           onClick={onConfirm}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-gradient-to-br from-[#3b82f6] to-[#22c55e] py-2 text-sm font-medium text-white transition-all hover:shadow-[0_0_20px_-4px_rgba(59,130,246,0.7)]"
         >
           <Check size={16} />
           Confirmar
         </button>
         <button
           onClick={onCancel}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-zinc-700 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-600"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-white/5 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-white/10"
         >
           <X size={16} />
           Cancelar
