@@ -28,6 +28,7 @@ import MovementModal from '@/components/modals/MovementModal';
 import GoalModal from '@/components/modals/GoalModal';
 import BudgetModal from '@/components/modals/BudgetModal';
 import SettingsModal from '@/components/modals/SettingsModal';
+import { ReporteMensualTab } from '@/components/reporte/ReporteMensual';
 import { ChatWidget } from '@/components/chat/ChatWidget';
 
 const tabVariants: Variants = {
@@ -371,45 +372,52 @@ export default function SinglePageApp() {
           </motion.div>
         )}
 
-        {/* TAB: PRESUPUESTOS */}
-        {currentTab === 'presupuestos' && (
-          <motion.div variants={tabVariants} initial="hidden" animate="show">
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-1 tracking-tight">
-                  Manejo de Presupuestos
-                </h2>
-                <p className="text-gray-400 text-sm">
-                  Control estricto de fuga de capital con analítica.
-                </p>
-              </div>
-              <button
-                onClick={() => setIsBudgetModalOpen(true)}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#3b82f6] hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-xl shadow-blue-900/40 active:scale-95 text-sm"
-              >
-                <Wallet size={18} /> Nuevo Límite Escudo
-              </button>
-            </header>
-            <div className="glass-card rounded-3xl p-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {data.presupuestos.length === 0 ? (
-                  <div className="col-span-full py-16 flex flex-col items-center justify-center text-gray-500">
-                    <Wallet size={64} className="opacity-20 mb-4" />
-                    <p className="text-lg">Tus finanzas no tienen barreras activas actualmente.</p>
-                  </div>
-                ) : (
-                  data.presupuestos.map((p) => (
-                    <PresupuestoProgress
-                      key={p.id}
-                      presupuesto={p}
-                      onDelete={handleDeleteBudget}
-                    />
-                  ))
-                )}
-              </div>
+      {/* TAB: PRESUPUESTOS */}
+      {currentTab === 'presupuestos' && (
+        <motion.div variants={tabVariants} initial="hidden" animate="show">
+          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-1 tracking-tight">
+                Manejo de Presupuestos
+              </h2>
+              <p className="text-gray-400 text-sm">
+                Control estricto de fuga de capital con analítica.
+              </p>
             </div>
-          </motion.div>
-        )}
+            <button
+              onClick={() => setIsBudgetModalOpen(true)}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#3b82f6] hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-xl shadow-blue-900/40 active:scale-95 text-sm"
+            >
+              <Wallet size={18} /> Nuevo Límite Escudo
+            </button>
+          </header>
+          <div className="glass-card rounded-3xl p-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {data.presupuestos.length === 0 ? (
+                <div className="col-span-full py-16 flex flex-col items-center justify-center text-gray-500">
+                  <Wallet size={64} className="opacity-20 mb-4" />
+                  <p className="text-lg">Tus finanzas no tienen barreras activas actualmente.</p>
+                </div>
+              ) : (
+                data.presupuestos.map((p) => (
+                  <PresupuestoProgress
+                    key={p.id}
+                    presupuesto={p}
+                    onDelete={handleDeleteBudget}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* TAB: REPORTE MENSUAL */}
+      {currentTab === 'reporte' && (
+        <motion.div variants={tabVariants} initial="hidden" animate="show">
+          <ReporteMensualTab onDeleted={fetchData} />
+        </motion.div>
+      )}
       </main>
 
       <BottomNav currentTab={currentTab} onTabChange={setCurrentTab} />

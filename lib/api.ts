@@ -64,6 +64,50 @@ export class ApiError extends Error {
 // API service — typed methods for each endpoint
 // =============================================
 
+// --- Reportes ---
+// Los Decimal de Pydantic llegan como string; el hook useReporteMensual los
+// convierte a number antes de calcular porcentajes o comparar valores.
+export type DecimalStr = string | number;
+
+export interface ReporteMensualCrudo {
+  periodo: { mes: number; anio: number; etiqueta: string };
+  resumen: {
+    ingresos: DecimalStr;
+    gastos: DecimalStr;
+    balance: DecimalStr;
+    tasa_ahorro: DecimalStr;
+    total_movimientos: number;
+    mes_anterior: {
+      ingresos: DecimalStr;
+      gastos: DecimalStr;
+      balance: DecimalStr;
+    } | null;
+    variacion: {
+      ingresos_pct: number | null;
+      gastos_pct: number | null;
+      balance_pct: number | null;
+    } | null;
+  };
+  categorias: {
+    nombre: string;
+    tipo: 'ingreso' | 'gasto';
+    ingresos: DecimalStr;
+    gastos: DecimalStr;
+    balance: DecimalStr;
+    movimientos: number;
+    peso_pct: DecimalStr;
+    color: string;
+  }[];
+  movimientos: {
+    id: string;
+    descripcion: string;
+    monto: DecimalStr;
+    tipo: 'ingreso' | 'gasto';
+    categoria: string;
+    fecha: string;
+  }[];
+}
+
 export const api = {
   // --- Auth ---
   auth: {
@@ -190,24 +234,52 @@ export const api = {
       }),
   },
 
-  // --- Budgets ---
-  budgets: {
-    create: (
-      token: string,
-      data: { id_categoria: number; monto_limite: number; mes: number; anio: number },
-    ) =>
-      apiRequest('/api/v1/budgets/', {
-        method: 'POST',
-        token,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      }),
+   // --- Budgets ---
+   budgets: {
+     create: (
+       token: string,
+       data: { id_categoria: number; monto_limite: number; mes: number; anio: number },
+     ) =>
+       apiRequest('/api/v1/budgets/', {
+         method: 'POST',
+         token,
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(data),
+       }),
 
-    delete: (token: string, id: string) =>
-      apiRequest(`/api/v1/budgets/${id}`, { method: 'DELETE', token }),
+     delete: (token: string, id: string) =>
+       apiRequest(`/api/v1/budgets/${id}`, { method: 'DELETE', token }),
+   },
+
+   // --- Reportes ---
+  reportes: {
+    mensual: (token: string, mes?: number, anio?: number) => {
+      const params = new URLSearchParams();
+      if (mes !== undefined) params.set('mes', String(mes));
+      if (anio !== undefined) params.set('anio', String(anio));
+      const qs = params.toString();
+      return apiRequest<ReporteMensualCrudo>(
+        `/api/v1/reportes/mensual${qs ? `?${qs}` : ''}`,
+        { token },
+      );
+    },
+
+    mesesConDatos: (token: string) =>
+      apiRequest<{ meses: { anio: number; mes: number; total: number }[] }>(
+        '/api/v1/reportes/meses',
+        { token },
+      ),
+
+    categoriasMes: (token: string, mes: number, anio: number) => {
+      const params = new URLSearchParams({ mes: String(mes), anio: String(anio) });
+      return apiRequest<ReporteMensualCrudo['categorias']>(
+        `/api/v1/reportes/categorias-mes?${params.toString()}`,
+        { token },
+      );
+    },
   },
 
-  // --- Users ---
+   // --- Users ---
   users: {
     updateProfile: async (token: string, formData: FormData) => {
       const response = await fetch(`${API_BASE}/api/v1/users/profile-picture`, {
