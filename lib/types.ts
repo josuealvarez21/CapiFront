@@ -60,7 +60,63 @@ export interface CategoriaBackend {
   tipo: string;
 }
 
-export type TabType = 'dashboard' | 'ingresos' | 'gastos' | 'metas' | 'presupuestos';
+// --- Reporte Mensual Types ---
+export interface ReportePeriodo {
+  mes: number;
+  anio: number;
+  etiqueta: string;
+}
+
+export interface ReporteTotales {
+  ingresos: number;
+  gastos: number;
+  balance: number;
+}
+
+export interface ReporteVariacion {
+  ingresos_pct: number | null;
+  gastos_pct: number | null;
+  balance_pct: number | null;
+}
+
+export interface ReporteResumen {
+  ingresos: number;
+  gastos: number;
+  balance: number;
+  tasa_ahorro: number;
+  total_movimientos: number;
+  mes_anterior: ReporteTotales | null;
+  variacion: ReporteVariacion | null;
+}
+
+export interface ReporteCategoria {
+  nombre: string;
+  tipo: 'ingreso' | 'gasto';
+  ingresos: number;
+  gastos: number;
+  balance: number;
+  movimientos: number;
+  peso_pct: number;
+  color: string;
+}
+
+export interface ReporteMovimiento {
+  id: string;
+  descripcion: string;
+  monto: number;
+  tipo: 'gasto' | 'ingreso';
+  categoria: string;
+  fecha: string; // ISO date string
+}
+
+export interface ReporteMensual {
+  periodo: ReportePeriodo;
+  resumen: ReporteResumen;
+  categorias: ReporteCategoria[];
+  movimientos: ReporteMovimiento[];
+}
+
+export type TabType = 'dashboard' | 'ingresos' | 'gastos' | 'metas' | 'presupuestos' | 'reporte';
 export type ModalMovementType = 'ambos' | 'ingreso' | 'gasto';
 export type SavingsDistributionMode = 'equitativa' | 'prioridad';
 

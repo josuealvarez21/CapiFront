@@ -28,15 +28,15 @@ export const formatAmountForDisplay = (value: string): string => {
 /**
  * Returns the appropriate Lucide icon for a financial category.
  */
-export const getCategoryIcon = (category: string): React.ReactElement => {
+export const getCategoryIcon = (category: string, size = 24): React.ReactElement => {
   const iconMap: Record<string, React.ReactElement> = {
-    Comida: <Utensils size={24} />,
-    Alquiler: <HomeIcon size={24} />,
-    Transporte: <Car size={24} />,
-    Servicios: <Zap size={24} />,
-    Salario: <TrendingUp size={24} />,
+    Comida: <Utensils size={size} />,
+    Alquiler: <HomeIcon size={size} />,
+    Transporte: <Car size={size} />,
+    Servicios: <Zap size={size} />,
+    Salario: <TrendingUp size={size} />,
   };
-  return iconMap[category] || <ShoppingCart size={24} />;
+  return iconMap[category] || <ShoppingCart size={size} />;
 };
 
 /**
@@ -61,3 +61,21 @@ export const getTodayISO = (): string => {
 export const getCurrentMonthISO = (): string => {
   return new Date().toISOString().slice(0, 7);
 };
+
+/**
+ * Nombres de los meses en español, indexados por mes - 1 (Enero = 0).
+ */
+export const MESES_ES = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+];
