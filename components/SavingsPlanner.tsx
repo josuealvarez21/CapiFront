@@ -18,7 +18,7 @@ interface SavingsPlannerProps {
   setManualSavingsAmount: (v: string) => void;
   showSuccessFeedback: string | null;
   showFeedback: (msg: string) => void;
-  fetchData: () => Promise<void>;
+  fetchData: () => Promise<unknown>;
 }
 
 export default function SavingsPlanner({
