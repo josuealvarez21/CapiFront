@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 
 import { AuthProvider } from '../context/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 
 export default function RootLayout({
   children,
@@ -37,14 +38,18 @@ export default function RootLayout({
         </div>
         {GOOGLE_CLIENT_ID ? (
           <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+            <QueryProvider>
+              <AuthProvider>
+                {children}
+              </AuthProvider>
+            </QueryProvider>
+          </GoogleOAuthProvider>
+        ) : (
+          <QueryProvider>
             <AuthProvider>
               {children}
             </AuthProvider>
-          </GoogleOAuthProvider>
-        ) : (
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          </QueryProvider>
         )}
       </body>
     </html>
