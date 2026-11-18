@@ -2,7 +2,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import type { ChatMessage, ConfirmationRequest, SSEEvent } from '@/lib/types';
+import type { ChatMessage, ConfirmationRequest, SSEEvent, ChatModo } from '@/lib/types';
 
 export function useChat(onDataChange?: () => void) {
   const { token } = useAuth();
@@ -30,7 +30,15 @@ export function useChat(onDataChange?: () => void) {
   const updateLastMessage = useCallback((content: string) => {
     setMessages((prev) => {
       if (prev.length === 0 || prev[prev.length - 1].role !== 'assistant') {
-        return [...prev, { id: crypto.randomUUID(), role: 'assistant', content, timestamp: new Date().toISOString() }];
+        return [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            role: 'assistant',
+            content,
+            timestamp: new Date().toISOString(),
+          },
+        ];
       }
       const updated = [...prev];
       const last = { ...updated[updated.length - 1] };
@@ -101,7 +109,7 @@ export function useChat(onDataChange?: () => void) {
   );
 
   const sendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, modo: ChatModo = 'texto') => {
       if (!token || !content.trim() || isLoading) return;
 
       abortRef.current?.abort();
@@ -122,7 +130,7 @@ export function useChat(onDataChange?: () => void) {
       }, 60000);
 
       try {
-        const response = await api.chat.send(token, content.trim());
+        const response = await api.chat.send(token, content.trim(), modo);
         if (!response.ok) {
           clearTimeout(timeoutId);
           updateLastMessage('Error al conectar con el asistente.');

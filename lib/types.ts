@@ -155,6 +155,9 @@ export interface AdminUserUpdate {
 export type AdminTabType = 'dashboard' | 'users';
 
 // --- Chat Types ---
+/** Modo de entrada del mensaje: define cómo debe redactar el bot los montos. */
+export type ChatModo = 'voz' | 'texto';
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
