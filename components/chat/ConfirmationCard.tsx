@@ -1,6 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Check, X } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface ConfirmationCardProps {
   tool: string;
@@ -30,7 +31,7 @@ function formatArgs(tool: string, args: Record<string, unknown>): string {
     };
 
     const cat = catNames[idCat] || `Categoría #${idCat}`;
-    let text = `$${monto.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} en ${cat}`;
+    let text = `${formatCurrency(Number(monto))} en ${cat}`;
     if (descripcion) text += ` — ${descripcion}`;
     if (fecha) text += `\nFecha: ${fecha}`;
     return text;
@@ -51,9 +52,7 @@ export function ConfirmationCard({ tool, args, onConfirm, onCancel }: Confirmati
         <AlertTriangle size={16} />
         <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
       </div>
-      <p className="mb-3 whitespace-pre-wrap text-sm text-gray-200">
-        {formatArgs(tool, args)}
-      </p>
+      <p className="mb-3 whitespace-pre-wrap text-sm text-gray-200">{formatArgs(tool, args)}</p>
       <p className="mb-3 text-xs text-gray-500">¿Confirmas esta operación?</p>
       <div className="flex gap-2">
         <button

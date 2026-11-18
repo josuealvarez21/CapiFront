@@ -1,4 +1,12 @@
-import type { DashboardData, CategoriaBackend, AdminStats, AdminUserListItem, AdminUserDetail, AdminUserUpdate } from './types';
+import type {
+  DashboardData,
+  CategoriaBackend,
+  AdminStats,
+  AdminUserListItem,
+  AdminUserDetail,
+  AdminUserUpdate,
+  ChatModo,
+} from './types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -144,7 +152,11 @@ export const api = {
       });
     },
 
-    me: (token: string) => apiRequest<{ id_usuario: number; nombre: string; email: string; rol: string }>('/api/v1/auth/me', { token }),
+    me: (token: string) =>
+      apiRequest<{ id_usuario: number; nombre: string; email: string; rol: string }>(
+        '/api/v1/auth/me',
+        { token },
+      ),
     googleLogin: async (accessToken: string) => {
       const response = await fetch(`${API_BASE}/api/v1/auth/google-login`, {
         method: 'POST',
@@ -234,34 +246,33 @@ export const api = {
       }),
   },
 
-   // --- Budgets ---
-   budgets: {
-     create: (
-       token: string,
-       data: { id_categoria: number; monto_limite: number; mes: number; anio: number },
-     ) =>
-       apiRequest('/api/v1/budgets/', {
-         method: 'POST',
-         token,
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify(data),
-       }),
+  // --- Budgets ---
+  budgets: {
+    create: (
+      token: string,
+      data: { id_categoria: number; monto_limite: number; mes: number; anio: number },
+    ) =>
+      apiRequest('/api/v1/budgets/', {
+        method: 'POST',
+        token,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
 
-     delete: (token: string, id: string) =>
-       apiRequest(`/api/v1/budgets/${id}`, { method: 'DELETE', token }),
-   },
+    delete: (token: string, id: string) =>
+      apiRequest(`/api/v1/budgets/${id}`, { method: 'DELETE', token }),
+  },
 
-   // --- Reportes ---
+  // --- Reportes ---
   reportes: {
     mensual: (token: string, mes?: number, anio?: number) => {
       const params = new URLSearchParams();
       if (mes !== undefined) params.set('mes', String(mes));
       if (anio !== undefined) params.set('anio', String(anio));
       const qs = params.toString();
-      return apiRequest<ReporteMensualCrudo>(
-        `/api/v1/reportes/mensual${qs ? `?${qs}` : ''}`,
-        { token },
-      );
+      return apiRequest<ReporteMensualCrudo>(`/api/v1/reportes/mensual${qs ? `?${qs}` : ''}`, {
+        token,
+      });
     },
 
     mesesConDatos: (token: string) =>
@@ -279,7 +290,7 @@ export const api = {
     },
   },
 
-   // --- Users ---
+  // --- Users ---
   users: {
     updateProfile: async (token: string, formData: FormData) => {
       const response = await fetch(`${API_BASE}/api/v1/users/profile-picture`, {
@@ -297,14 +308,14 @@ export const api = {
 
   // --- Chat ---
   chat: {
-    send: (token: string, message: string): Promise<Response> => {
+    send: (token: string, message: string, modo: ChatModo = 'texto'): Promise<Response> => {
       return fetch(`${API_BASE}/api/v1/chat/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, modo }),
       });
     },
 
@@ -365,14 +376,12 @@ export const api = {
       return res.blob();
     },
 
-    clear: (token: string) =>
-      apiRequest<void>('/api/v1/chat/history', { method: 'DELETE', token }),
+    clear: (token: string) => apiRequest<void>('/api/v1/chat/history', { method: 'DELETE', token }),
   },
 
   // --- Admin ---
   admin: {
-    getStats: (token: string) =>
-      apiRequest<AdminStats>('/api/v1/admin/stats', { token }),
+    getStats: (token: string) => apiRequest<AdminStats>('/api/v1/admin/stats', { token }),
 
     listUsers: (token: string, params?: { rol?: string; skip?: number; limit?: number }) => {
       const searchParams = new URLSearchParams();
