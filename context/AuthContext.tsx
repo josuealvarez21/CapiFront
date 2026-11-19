@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       fetchUser(newToken);
 
       setTimeout(() => {
-        router.replace('/');
+        router.replace('/app');
       }, 10);
     } catch (err) {
       console.error('Error saving token:', err);

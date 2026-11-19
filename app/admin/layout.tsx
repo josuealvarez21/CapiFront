@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.replace('/login');
     } else if (rol !== 'admin') {
       redirected.current = true;
-      router.replace('/');
+      router.replace('/app');
     }
   }, [token, rol, loading, router]);
 
