@@ -77,7 +77,7 @@ export default function MovementModal({
               onChange={(e) =>
                 setFormData({ ...formData, monto: e.target.value.replace(/\D/g, '') })
               }
-              className="w-full bg-white/5 border border-white/10 focus:border-[#3b82f6] rounded-2xl py-5 pl-10 pr-6 text-white text-3xl font-black outline-none transition-all placeholder:text-gray-700"
+              className="w-full bg-white/5 border border-white/10 focus:border-[#3b82f6] rounded-2xl py-4 pl-10 pr-4 text-white text-2xl font-black outline-none transition-all placeholder:text-gray-700 sm:py-5 sm:pr-6 sm:text-3xl"
               required
             />
           </div>

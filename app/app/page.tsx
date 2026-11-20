@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, type Variants } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   TrendingUp,
   TrendingDown,
@@ -15,9 +15,12 @@ import { useDashboard } from '@/hooks/useDashboard';
 import { formatCurrency } from '@/lib/utils';
 import { getProjectedForMeta } from '@/lib/savings';
 import { api } from '@/lib/api';
+import { tabSwap } from '@/lib/motion';
 
 import Sidebar from '@/components/Sidebar';
 import BottomNav from '@/components/BottomNav';
+import DashboardHeader from '@/components/DashboardHeader';
+import DashboardInsights from '@/components/DashboardInsights';
 import SummaryCards from '@/components/SummaryCards';
 import IncomeExpenseChart from '@/components/charts/IncomeExpenseChart';
 import MovementsList from '@/components/MovementsList';
@@ -28,17 +31,15 @@ import MovementModal from '@/components/modals/MovementModal';
 import GoalModal from '@/components/modals/GoalModal';
 import BudgetModal from '@/components/modals/BudgetModal';
 import SettingsModal from '@/components/modals/SettingsModal';
+import ConfirmDialog, { type ConfirmOptions } from '@/components/modals/ConfirmDialog';
 import { ReporteMensualTab } from '@/components/reporte/ReporteMensual';
 import { ChatWidget } from '@/components/chat/ChatWidget';
 
-const tabVariants: Variants = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
-};
-
 export default function SinglePageApp() {
   const dashboard = useDashboard();
+  const reduceMotion = useReducedMotion() ?? false;
   const [monthFilter, setMonthFilter] = useState('');
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmOptions | null>(null);
 
   const {
     token,
@@ -94,24 +95,26 @@ export default function SinglePageApp() {
   // --- Loading / Auth states ---
   if (authLoading || !token) {
     return (
-      <div className="min-h-screen bg-[#090d16] flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1 }}
-          className="w-12 h-12 border-4 border-[#3b82f6] border-t-transparent rounded-full"
-        />
+      <div className="flex min-h-screen items-center justify-center bg-[#090d16] p-6">
+        <div className="glass-card flex flex-col items-center gap-4 rounded-3xl px-10 py-8">
+          <motion.div
+            animate={reduceMotion ? undefined : { rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1 }}
+            className="h-10 w-10 rounded-full border-4 border-[#3b82f6] border-t-transparent"
+          />
+          <p className="eyebrow neon-text">Cápi</p>
+        </div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#090d16] flex items-center justify-center text-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#3b82f6] border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-400 font-medium font-sans animate-pulse">
-            Sincronizando cuentas con Cápi...
-          </p>
+      <div className="flex min-h-screen items-center justify-center bg-[#090d16] p-6">
+        <div className="glass-card flex flex-col items-center gap-4 rounded-3xl px-10 py-9 text-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#3b82f6] border-t-transparent motion-reduce:animate-none" />
+          <p className="eyebrow neon-text">Cápi</p>
+          <p className="text-sm text-gray-400">Sincronizando cuentas con Cápi...</p>
         </div>
       </div>
     );
@@ -119,15 +122,18 @@ export default function SinglePageApp() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-[#090d16] flex flex-col items-center justify-center text-white space-y-4">
-        <h2 className="text-xl text-red-400 font-bold">Error de Conexión</h2>
-        <p className="text-gray-400">No se pudo cargar el Dashboard. Comprueba tu backend.</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-[#3b82f6] px-6 py-2 rounded-xl text-white mt-4 hover:bg-blue-500 transition shadow-lg shadow-blue-900/20"
-        >
-          Reintentar
-        </button>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#090d16] p-6 text-center text-white">
+        <div className="glass-card flex max-w-md flex-col items-center gap-4 rounded-3xl px-8 py-10">
+          <h2 className="text-2xl font-extrabold tracking-tight text-red-400">
+            Error de conexión
+          </h2>
+          <p className="text-sm text-gray-400">
+            No se pudo cargar el dashboard. Comprueba tu backend e inténtalo de nuevo.
+          </p>
+          <button onClick={() => window.location.reload()} className="btn-primary mt-2">
+            Reintentar
+          </button>
+        </div>
         <ChatWidget />
       </div>
     );
@@ -161,35 +167,45 @@ export default function SinglePageApp() {
         onLogout={logout}
       />
 
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-24 md:pb-8 relative min-h-screen">
-        {/* TAB: DASHBOARD */}
+      <main className="relative min-h-screen flex-1 overflow-y-auto px-4 pt-4 pb-[calc(9rem+env(safe-area-inset-bottom))] sm:px-6 sm:pt-6 md:pb-8 lg:px-8 lg:pt-8">
+        <div className="mx-auto w-full max-w-[1400px]">
+          <AnimatePresence mode="wait" initial={false}>
+            {/* TAB: DASHBOARD */}
         {currentTab === 'dashboard' && (
-          <motion.div variants={tabVariants} initial="hidden" animate="show">
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-1 tracking-tight">
-                  Resumen General
-                </h2>
-                <p className="text-gray-400 text-sm">
-                  Monitoreo de flujo de caja en tiempo real.
-                </p>
-              </div>
-              <div className="flex flex-row w-full sm:w-auto gap-3">
-                <button
-                  onClick={() => openMovementModal('ingreso')}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#22c55e]/15 hover:bg-[#22c55e] hover:text-[#090d16] text-[#22c55e] border border-[#22c55e]/30 px-4 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-green-900/20 active:scale-95 text-sm"
-                >
-                  <PlusCircle size={18} /> Ingreso
-                </button>
-                <button
-                  onClick={() => openMovementModal('gasto')}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-4 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-95 text-sm"
-                >
-                  <MinusCircle size={18} /> Gasto
-                </button>
-              </div>
-            </header>
+          <motion.div
+              key={currentTab}
+              variants={tabSwap}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              transition={reduceMotion ? { duration: 0 } : undefined}
+            >
+            <DashboardHeader
+              userName={data.user.nombre}
+              title="Resumen General"
+              description="Monitoreo de flujo de caja en tiempo real."
+              reduceMotion={reduceMotion}
+              actions={
+                <>
+                  <button
+                    type="button"
+                    onClick={() => openMovementModal('ingreso')}
+                    className="btn-ghost flex-1 text-[#4ade80] sm:flex-none"
+                  >
+                    <PlusCircle size={18} /> Ingreso
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openMovementModal('gasto')}
+                    className="btn-danger flex-1 sm:flex-none"
+                  >
+                    <MinusCircle size={18} /> Gasto
+                  </button>
+                </>
+              }
+            />
             <SummaryCards summary={data.summary} />
+            <DashboardInsights data={data} reduceMotion={reduceMotion} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <IncomeExpenseChart
                 summary={data.summary}
@@ -202,8 +218,11 @@ export default function SinglePageApp() {
                 className="glass-card rounded-3xl p-5"
               >
                 <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-                  <h3 className="text-lg font-bold text-white">Últimos Movimientos</h3>
+                  <h3 className="text-lg font-extrabold tracking-tight neon-text">
+                    Últimos Movimientos
+                  </h3>
                   <select
+                    aria-label="Filtrar movimientos por mes"
                     value={monthFilter}
                     onChange={(e) => setMonthFilter(e.target.value)}
                     className="glass-soft bg-[#0a0e17] text-xs font-bold text-white border border-white/10 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#3b82f6] [color-scheme:dark] cursor-pointer"
@@ -230,35 +249,44 @@ export default function SinglePageApp() {
 
         {/* TAB: INGRESOS / GASTOS */}
         {(currentTab === 'ingresos' || currentTab === 'gastos') && (
-          <motion.div variants={tabVariants} initial="hidden" animate="show">
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-1 tracking-tight">
-                  Registro de {currentTab === 'ingresos' ? 'Ingresos' : 'Gastos'}
-                </h2>
-                <p className="text-gray-400 text-sm">Historial completo detallado.</p>
-              </div>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-                <select
-                  value={monthFilter}
-                  onChange={(e) => setMonthFilter(e.target.value)}
-                  className="glass-soft bg-[#0a0e17] text-sm font-bold text-white border border-white/10 rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#3b82f6] [color-scheme:dark] cursor-pointer"
-                >
-                  <option value="">Todos los meses</option>
-                  {monthOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={() => openMovementModal(currentTab === 'ingresos' ? 'ingreso' : 'gasto')}
-                  className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all duration-300 text-white shadow-xl active:scale-95 text-sm ${currentTab === 'ingresos' ? 'bg-[#22c55e] hover:bg-[#16a34a] shadow-green-900/20' : 'bg-red-500 hover:bg-red-600 shadow-red-900/20'}`}
-                >
-                  <Plus size={18} /> Añadir {currentTab === 'ingresos' ? 'ingreso' : 'gasto'}
-                </button>
-              </div>
-            </header>
+          <motion.div
+              key={currentTab}
+              variants={tabSwap}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              transition={reduceMotion ? { duration: 0 } : undefined}
+            >
+            <DashboardHeader
+              userName={data.user.nombre}
+              title={`Registro de ${currentTab === 'ingresos' ? 'Ingresos' : 'Gastos'}`}
+              description="Historial completo detallado."
+              reduceMotion={reduceMotion}
+              actions={
+                <>
+                  <select
+                    aria-label="Filtrar por mes"
+                    value={monthFilter}
+                    onChange={(e) => setMonthFilter(e.target.value)}
+                    className="glass-soft min-w-44 bg-[#0a0e17] text-sm font-bold text-white border border-white/10 rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#3b82f6] [color-scheme:dark] cursor-pointer"
+                  >
+                    <option value="">Todos los meses</option>
+                    {monthOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => openMovementModal(currentTab === 'ingresos' ? 'ingreso' : 'gasto')}
+                    className={currentTab === 'ingresos' ? 'btn-primary' : 'btn-danger'}
+                  >
+                    <Plus size={18} /> Añadir {currentTab === 'ingresos' ? 'ingreso' : 'gasto'}
+                  </button>
+                </>
+              }
+            />
             <div className="glass-card rounded-3xl p-5">
               <MovementsList
                 movements={movementsFiltered}
@@ -279,23 +307,25 @@ export default function SinglePageApp() {
 
         {/* TAB: METAS */}
         {currentTab === 'metas' && (
-          <motion.div variants={tabVariants} initial="hidden" animate="show">
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-1 tracking-tight">
-                  Tus Metas de Ahorro
-                </h2>
-                <p className="text-gray-400 text-sm">
-                  Define un horizonte para tus ahorros con acento esmeralda.
-                </p>
-              </div>
-              <button
-                onClick={() => setIsGoalModalOpen(true)}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#22c55e] hover:bg-[#16a34a] text-[#090d16] px-5 py-2.5 rounded-xl font-bold transition-all shadow-xl shadow-green-900/40 active:scale-95 text-sm"
-              >
-                <Plus size={18} /> Definir Objetivo
-              </button>
-            </header>
+          <motion.div
+              key={currentTab}
+              variants={tabSwap}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              transition={reduceMotion ? { duration: 0 } : undefined}
+            >
+            <DashboardHeader
+              userName={data.user.nombre}
+              title="Tus Metas de Ahorro"
+              description="Define un horizonte para tus ahorros con acento esmeralda."
+              reduceMotion={reduceMotion}
+              actions={
+                <button type="button" onClick={() => setIsGoalModalOpen(true)} className="btn-primary">
+                  <Plus size={18} /> Definir Objetivo
+                </button>
+              }
+            />
 
             <SavingsPlanner
               data={data}
@@ -309,11 +339,12 @@ export default function SinglePageApp() {
               showSuccessFeedback={showSuccessFeedback}
               showFeedback={showFeedback}
               fetchData={fetchData}
+              onRequestConfirm={setPendingConfirm}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {data.metas.length === 0 ? (
-                <div className="col-span-full border-2 border-dashed border-white/10 rounded-3xl p-16 flex flex-col items-center justify-center text-gray-500 glass-soft">
+                <div className="col-span-full border-2 border-dashed border-white/10 rounded-3xl p-8 sm:p-16 flex flex-col items-center justify-center text-gray-500 glass-soft">
                   <Target size={64} className="opacity-20 mb-4" />
                   <p className="text-lg">No has establecido ninguna meta financiera aún.</p>
                 </div>
@@ -342,24 +373,30 @@ export default function SinglePageApp() {
                         projectedAmount={projectedAmount}
                       />
                       <button
-                        onClick={async () => {
-                          if (
-                            confirm(
-                              `¿Quieres abonar ${formatCurrency(projectedAmount)} a esta meta?`,
-                            )
-                          ) {
-                            try {
-                              await api.goals.update(token, meta.id, projectedAmount);
-                              showFeedback(
-                                `¡Abono de ${formatCurrency(projectedAmount)} realizado!`,
-                              );
-                              await fetchData();
-                            } catch (e) {
-                              console.error(e);
-                            }
-                          }
-                        }}
-                        className={`w-full mt-3 py-2.5 border transition-all rounded-xl font-bold uppercase tracking-wider text-sm shadow-md ${projectedAmount > 0 ? 'bg-[#22c55e] text-[#090d16] border-[#22c55e] hover:bg-[#16a34a]' : 'bg-[#0a0e17] border-white/10 text-gray-500 cursor-not-allowed'}`}
+                        type="button"
+                        onClick={() =>
+                          setPendingConfirm({
+                            title: 'Confirmar abono',
+                            description: `¿Quieres abonar ${formatCurrency(projectedAmount)} a la meta "${meta.nombre}"?`,
+                            confirmLabel: 'Abonar',
+                            onConfirm: async () => {
+                              try {
+                                await api.goals.update(token, meta.id, projectedAmount);
+                                showFeedback(
+                                  `¡Abono de ${formatCurrency(projectedAmount)} realizado!`,
+                                );
+                                await fetchData();
+                              } catch (e) {
+                                console.error(e);
+                              }
+                            },
+                          })
+                        }
+                        className={`mt-3 w-full rounded-xl border py-2.5 text-sm font-bold uppercase tracking-wider transition-all shadow-md ${
+                          projectedAmount > 0
+                            ? 'btn-primary'
+                            : 'cursor-not-allowed border-white/10 bg-[#0a0e17] text-gray-500'
+                        }`}
                         disabled={projectedAmount <= 0}
                       >
                         {projectedAmount > 0 ? 'Abonar Plan' : 'Sin Alocación'}
@@ -374,23 +411,25 @@ export default function SinglePageApp() {
 
       {/* TAB: PRESUPUESTOS */}
       {currentTab === 'presupuestos' && (
-        <motion.div variants={tabVariants} initial="hidden" animate="show">
-          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-1 tracking-tight">
-                Manejo de Presupuestos
-              </h2>
-              <p className="text-gray-400 text-sm">
-                Control estricto de fuga de capital con analítica.
-              </p>
-            </div>
-            <button
-              onClick={() => setIsBudgetModalOpen(true)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#3b82f6] hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-xl shadow-blue-900/40 active:scale-95 text-sm"
+        <motion.div
+              key={currentTab}
+              variants={tabSwap}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              transition={reduceMotion ? { duration: 0 } : undefined}
             >
-              <Wallet size={18} /> Nuevo Límite Escudo
-            </button>
-          </header>
+          <DashboardHeader
+            userName={data.user.nombre}
+            title="Manejo de Presupuestos"
+            description="Control estricto de fuga de capital con analítica."
+            reduceMotion={reduceMotion}
+            actions={
+              <button type="button" onClick={() => setIsBudgetModalOpen(true)} className="btn-primary">
+                <Wallet size={18} /> Nuevo Límite Escudo
+              </button>
+            }
+          />
           <div className="glass-card rounded-3xl p-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {data.presupuestos.length === 0 ? (
@@ -414,10 +453,19 @@ export default function SinglePageApp() {
 
       {/* TAB: REPORTE MENSUAL */}
       {currentTab === 'reporte' && (
-        <motion.div variants={tabVariants} initial="hidden" animate="show">
+        <motion.div
+              key={currentTab}
+              variants={tabSwap}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              transition={reduceMotion ? { duration: 0 } : undefined}
+            >
           <ReporteMensualTab onDeleted={fetchData} />
         </motion.div>
       )}
+          </AnimatePresence>
+        </div>
       </main>
 
       <BottomNav currentTab={currentTab} onTabChange={setCurrentTab} />
@@ -463,6 +511,11 @@ export default function SinglePageApp() {
         profilePicFile={profilePicFile}
         setProfilePicFile={setProfilePicFile}
         isUploading={isUploadingProfilePic}
+      />
+      <ConfirmDialog
+        options={pendingConfirm}
+        onClose={() => setPendingConfirm(null)}
+        reduceMotion={reduceMotion}
       />
       <ChatWidget onDataChange={fetchData} />
     </div>

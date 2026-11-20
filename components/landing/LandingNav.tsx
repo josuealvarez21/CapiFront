@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import LandingLogo from '@/components/landing/LandingLogo';
 import { fadeUpSmall } from '@/lib/motion';
 
 const anchors = [
@@ -28,11 +29,8 @@ export default function LandingNav() {
         aria-label="Principal"
         className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8"
       >
-        <Link href="/" aria-label="Cápi, inicio" className="flex items-center gap-3">
-          <span className="neon-text text-2xl font-extrabold tracking-tight sm:text-3xl">Cápi</span>
-          <span className="hidden text-[10px] font-semibold uppercase tracking-widest text-gray-400 sm:block">
-            Hub Financiero
-          </span>
+        <Link href="/" aria-label="Cápi, inicio" className="flex items-center rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3b82f6]">
+          <LandingLogo />
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">

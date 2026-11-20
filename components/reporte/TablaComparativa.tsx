@@ -58,7 +58,7 @@ export function TablaComparativa({ categorias, totalMovimientos }: TablaComparat
     >
       <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-[#3b82f6] blur-3xl opacity-10 pointer-events-none" />
 
-      <div className="flex items-center justify-between gap-3 mb-4 relative z-10">
+      <div className="relative z-10 mb-4 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
         <div className="flex items-center gap-2">
           <Table2 size={18} className="text-[#60a5fa]" />
           <h3 className="text-lg font-bold text-white">Comparativa por Categoría</h3>

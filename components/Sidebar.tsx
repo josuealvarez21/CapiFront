@@ -13,6 +13,7 @@ import {
   CalendarDays,
 } from 'lucide-react';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import type { TabType, UserData } from '@/lib/types';
@@ -100,13 +101,14 @@ export default function Sidebar({
 
         <div className="px-5 pb-4 flex items-center gap-3">
           <div className="w-10 lg:w-12 h-10 lg:h-12 rounded-full bg-gradient-to-tr from-[#3b82f6] to-[#22c55e] p-[2px] shadow-lg shrink-0">
-            <img
+            <Image
               src={avatarSrc}
-              alt="Profile"
+              alt="Foto de perfil"
               width={48}
               height={48}
+              unoptimized
               onError={() => setAvatarError(true)}
-              className="w-full h-full rounded-full object-cover border-2 border-[#0a0e17]"
+              className="h-full w-full rounded-full border-2 border-[#0a0e17] object-cover"
             />
           </div>
           <div className="overflow-hidden min-w-0">

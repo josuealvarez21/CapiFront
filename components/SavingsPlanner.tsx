@@ -6,6 +6,7 @@ import { formatCurrency } from '@/lib/utils';
 import { calculateSavingsDistribution } from '@/lib/savings';
 import { api } from '@/lib/api';
 import type { DashboardData, SavingsDistributionMode } from '@/lib/types';
+import type { ConfirmOptions } from '@/components/modals/ConfirmDialog';
 
 interface SavingsPlannerProps {
   data: DashboardData;
@@ -19,6 +20,7 @@ interface SavingsPlannerProps {
   showSuccessFeedback: string | null;
   showFeedback: (msg: string) => void;
   fetchData: () => Promise<unknown>;
+  onRequestConfirm: (options: ConfirmOptions) => void;
 }
 
 export default function SavingsPlanner({
@@ -33,12 +35,13 @@ export default function SavingsPlanner({
   showSuccessFeedback,
   showFeedback,
   fetchData,
+  onRequestConfirm,
 }: SavingsPlannerProps) {
   const totalToDistribute = manualSavingsAmount
     ? Number(manualSavingsAmount)
     : (Number(data.summary.balance_total) * savingsPercentage) / 100;
 
-  const handleExecutePlan = async () => {
+  const handleExecutePlan = () => {
     if (totalToDistribute <= 0) return;
 
     const allocations = calculateSavingsDistribution(
@@ -47,29 +50,30 @@ export default function SavingsPlanner({
       savingsDistributionMode,
     );
 
-    if (
-      confirm(
-        `¿Confirmas la distribución de ${formatCurrency(totalToDistribute)} en ${allocations.length} metas?`,
-      )
-    ) {
-      try {
-        await api.goals.bulkAllocate(token, allocations);
-        showFeedback('¡Inversión exitosa! Tus metas están más cerca.');
-        await fetchData();
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    onRequestConfirm({
+      title: 'Ejecutar plan de inversión',
+      description: `¿Confirmas la distribución de ${formatCurrency(totalToDistribute)} en ${allocations.length} metas?`,
+      confirmLabel: 'Distribuir',
+      onConfirm: async () => {
+        try {
+          await api.goals.bulkAllocate(token, allocations);
+          showFeedback('¡Inversión exitosa! Tus metas están más cerca.');
+          await fetchData();
+        } catch (e) {
+          console.error(e);
+        }
+      },
+    });
   };
 
   return (
-    <div className="glass-card rounded-3xl p-6 mb-8 relative overflow-hidden">
+    <div className="glass-card relative mb-6 overflow-hidden rounded-3xl p-4 sm:mb-8 sm:p-6">
       <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-[#3b82f6] opacity-5 pointer-events-none" />
 
       <div className="flex flex-col lg:flex-row justify-between items-start gap-6 relative z-10">
         <div className="max-w-md">
-          <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-3">
-            <Target className="text-[#3b82f6]" /> Planificador de Inversión
+          <h3 className="mb-2 flex items-center gap-2 text-base font-extrabold tracking-tight neon-text sm:gap-3 sm:text-lg">
+            <Target className="text-[#60a5fa]" aria-hidden="true" /> Planificador de Inversión
           </h3>
           <p className="text-gray-400 text-sm mb-5">
             Optimiza cómo crece tu dinero. Elige un porcentaje o un monto exacto y decide cómo
@@ -97,7 +101,7 @@ export default function SavingsPlanner({
           </p>
         </div>
 
-        <div className="flex-1 w-full glass-soft p-5 rounded-2xl border border-white/10">
+        <div className="w-full flex-1 glass-soft rounded-2xl border border-white/10 p-4 sm:p-5">
           <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
             <div className="flex-1">
               <div className="flex justify-between mb-2">
@@ -142,7 +146,7 @@ export default function SavingsPlanner({
               <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">
                 Balance Disponible
               </p>
-              <p className="text-md font-bold text-white">
+              <p className="text-sm font-bold text-white sm:text-base">
                 {formatCurrency(data.summary.balance_total)}
               </p>
             </div>
@@ -150,14 +154,11 @@ export default function SavingsPlanner({
               <p className="text-[10px] text-[#4ade80] uppercase font-bold mb-1">
                 Total a Invertir
               </p>
-              <p className="text-md font-bold text-[#4ade80]">
+              <p className="text-sm font-bold text-[#4ade80] sm:text-base">
                 {formatCurrency(totalToDistribute)}
               </p>
             </div>
-            <button
-              onClick={handleExecutePlan}
-              className="bg-[#22c55e] hover:bg-[#16a34a] text-[#090d16] font-extrabold rounded-xl transition-all shadow-lg shadow-green-900/30 flex items-center justify-center gap-2"
-            >
+            <button type="button" onClick={handleExecutePlan} className="btn-primary">
               <PlusCircle size={18} /> Ejecutar Plan
             </button>
           </div>

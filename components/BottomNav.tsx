@@ -38,12 +38,12 @@ export default function BottomNav({ currentTab, onTabChange }: BottomNavProps) {
               }`}
             >
               <Icon
-                size={21}
-                className={`shrink-0 transition-transform ${
+                size={19}
+                className={`shrink-0 transition-transform sm:h-[21px] sm:w-[21px] ${
                   isActive ? 'scale-110' : 'scale-100'
                 }`}
               />
-              <span className="w-full text-center text-[9px] sm:text-[10px] font-bold leading-tight truncate px-0.5">
+              <span className="w-full truncate px-0.5 text-center text-[8px] font-bold leading-tight sm:text-[10px]">
                 {label}
               </span>
             </button>

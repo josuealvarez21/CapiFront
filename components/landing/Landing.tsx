@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useReducedMotion } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
 import LandingNav from '@/components/landing/LandingNav';
 import Hero from '@/components/landing/Hero';
 import FeatureBento from '@/components/landing/FeatureBento';
@@ -11,6 +13,14 @@ import LandingFooter from '@/components/landing/LandingFooter';
 
 export default function Landing() {
   const reduceMotion = useReducedMotion() ?? false;
+  const { token, loading, clearSession } = useAuth();
+
+  // Abrir la landing cierra la sesión: para volver al dashboard siempre se pide login.
+  useEffect(() => {
+    if (!loading && token) {
+      clearSession();
+    }
+  }, [loading, token, clearSession]);
 
   return (
     <div className="min-h-screen bg-[#090d16] font-sans text-white">

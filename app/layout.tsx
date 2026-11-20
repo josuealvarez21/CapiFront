@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { MotionConfig } from 'framer-motion';
 import './globals.css';
 
 const geistSans = Geist({
@@ -36,21 +37,23 @@ export default function RootLayout({
           <div className="absolute -top-32 -left-32 h-[34rem] w-[34rem] rounded-full bg-[#22c55e] opacity-20 blur-3xl" />
           <div className="absolute -bottom-40 -right-32 h-[38rem] w-[38rem] rounded-full bg-[#3b82f6] opacity-20 blur-3xl" />
         </div>
-        {GOOGLE_CLIENT_ID ? (
-          <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <MotionConfig reducedMotion="user">
+          {GOOGLE_CLIENT_ID ? (
+            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+              <QueryProvider>
+                <AuthProvider>
+                  {children}
+                </AuthProvider>
+              </QueryProvider>
+            </GoogleOAuthProvider>
+          ) : (
             <QueryProvider>
               <AuthProvider>
                 {children}
               </AuthProvider>
             </QueryProvider>
-          </GoogleOAuthProvider>
-        ) : (
-          <QueryProvider>
-            <AuthProvider>
-              {children}
-            </AuthProvider>
-          </QueryProvider>
-        )}
+          )}
+        </MotionConfig>
       </body>
     </html>
   );

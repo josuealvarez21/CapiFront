@@ -22,13 +22,24 @@ const item: Variants = {
 };
 
 export default function SummaryCards({ summary }: SummaryCardsProps) {
+  const ingresos = Number(summary.ingresos_mes) || 0;
+  const gastos = Number(summary.gastos_mes) || 0;
+  const totalFlujo = ingresos + gastos;
+
+  const barWidth = (key: string) => {
+    if (key === 'balance') return '100%';
+    if (totalFlujo <= 0) return '0%';
+    const valor = key === 'ingresos' ? ingresos : gastos;
+    return `${Math.max((valor / totalFlujo) * 100, valor > 0 ? 2 : 0)}%`;
+  };
+
   const cards = [
     {
       key: 'balance',
       label: 'Balance Total',
       field: 'balance_total' as const,
       icon: Wallet,
-      accent: '#3b82f6',
+      accentColor: '#3b82f6',
       iconChip: 'text-[#60a5fa] bg-[#3b82f6]/15 border-[#3b82f6]/30',
       border: 'border-[#3b82f6]/40',
       glow: 'hover:border-[#3b82f6]/80 hover:shadow-[0_0_40px_-8px_rgba(59,130,246,0.6)]',
@@ -73,7 +84,7 @@ export default function SummaryCards({ summary }: SummaryCardsProps) {
           key={key}
           variants={item}
           whileHover={{ y: -4 }}
-          className={`glass-card rounded-3xl p-5 ${border} ${glow} transition-all duration-300 relative overflow-hidden group`}
+          className={`glass-card relative overflow-hidden rounded-3xl p-4 transition-all duration-300 group sm:p-5 ${border} ${glow}`}
         >
           <div
             className={`absolute -top-10 -right-10 h-32 w-32 rounded-full bg-gradient-to-br ${wash} to-transparent blur-2xl pointer-events-none group-hover:opacity-100 opacity-70 transition-opacity duration-500`}
@@ -90,11 +101,23 @@ export default function SummaryCards({ summary }: SummaryCardsProps) {
               <Icon size={18} />
             </div>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-white relative z-10 tracking-tight">
+          <h3
+            className={`stat-value relative z-10 text-2xl font-extrabold tracking-tight sm:text-3xl ${
+              key === 'balance' ? 'neon-text' : 'text-white'
+            }`}
+          >
             {formatCurrency(summary[field])}
           </h3>
-          <div className="mt-3 h-1 w-full bg-white/5 rounded-full overflow-hidden relative z-10">
-            <div className={`h-full w-2/3 rounded-full bg-gradient-to-r ${bar} opacity-80`} />
+          <div
+            className="relative z-10 mt-3 h-1 w-full overflow-hidden rounded-full bg-white/5"
+            aria-hidden="true"
+          >
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: barWidth(key) }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              className={`h-full rounded-full bg-gradient-to-r ${bar} opacity-80`}
+            />
           </div>
         </motion.div>
       ))}

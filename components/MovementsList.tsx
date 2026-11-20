@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
 import { formatCurrency, getCategoryIcon, getCategoryBadgeClass } from '@/lib/utils';
 import type { Transaccion } from '@/lib/types';
@@ -29,19 +30,22 @@ export default function MovementsList({
   }
 
   const isCompact = variant === 'compact';
-  const padding = isCompact ? 'p-4' : 'p-5';
-  const textSize = isCompact ? 'text-base' : 'text-xl';
-  const amountSize = isCompact ? 'text-lg' : 'text-2xl';
-  const iconPadding = isCompact ? 'p-3' : 'p-4';
+  const padding = isCompact ? 'p-3 sm:p-4' : 'p-4 sm:p-5';
+  const textSize = isCompact ? 'text-sm sm:text-base' : 'text-lg sm:text-xl';
+  const amountSize = isCompact ? 'text-sm sm:text-lg' : 'text-base sm:text-2xl';
+  const iconPadding = isCompact ? 'p-2.5 sm:p-3' : 'p-3 sm:p-4';
 
   return (
     <div className="space-y-4">
       {movements.map((mov) => (
-        <div
+        <motion.div
           key={mov.id}
-          className={`flex items-center justify-between glass-soft ${padding} rounded-2xl border border-white/10 hover:border-[#3b82f6]/40 hover:bg-[#0f172a]/40 transition-all duration-300 group`}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+          className={`flex min-w-0 items-start justify-between gap-2 glass-soft ${padding} rounded-2xl border border-white/10 hover:border-[#3b82f6]/40 hover:bg-[#0f172a]/40 transition-all duration-300 group sm:items-center sm:gap-4`}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <div
               className={`${iconPadding} rounded-xl flex-shrink-0 transition-transform group-hover:scale-110 ${
                 mov.tipo === 'ingreso'
@@ -51,8 +55,8 @@ export default function MovementsList({
             >
               {getCategoryIcon(mov.categoria)}
             </div>
-            <div>
-              <p className={`${textSize} font-bold text-white`}>{mov.descripcion}</p>
+            <div className="min-w-0">
+              <p className={`${textSize} truncate font-bold text-white`}>{mov.descripcion}</p>
               <p className="text-xs text-gray-400 font-medium mt-1">
                 <span
                   className={`mr-2 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider ${getCategoryBadgeClass(mov.tipo)}`}
@@ -63,21 +67,23 @@ export default function MovementsList({
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-4">
             <span
-              className={`font-extrabold ${amountSize} ${mov.tipo === 'ingreso' ? 'text-[#4ade80]' : 'text-white'}`}
+              className={`stat-value whitespace-nowrap font-extrabold tabular-nums ${amountSize} ${mov.tipo === 'ingreso' ? 'text-[#4ade80]' : 'text-white'}`}
             >
               {mov.tipo === 'ingreso' ? '+' : '-'}
               {formatCurrency(mov.monto)}
             </span>
             <button
+              type="button"
               onClick={() => onDelete(mov.id)}
-              className="text-gray-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+              aria-label={`Eliminar movimiento ${mov.descripcion}`}
+              className="-mr-1 shrink-0 rounded-lg p-1 text-gray-500 transition-colors hover:bg-red-500/10 hover:text-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3b82f6] sm:p-1.5 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
             >
-              <Trash2 size={isCompact ? 18 : 22} />
+              <Trash2 size={isCompact ? 16 : 18} className="sm:h-[22px] sm:w-[22px]" />
             </button>
           </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   );

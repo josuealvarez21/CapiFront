@@ -146,7 +146,7 @@ export function ComparativaMesAnterior({ resumen, periodo }: ComparativaMesAnter
                         transition={{ duration: 0.7, ease: 'easeOut' }}
                       />
                     </div>
-                    <span className="w-28 text-right tabular-nums font-extrabold text-white">
+                    <span className="w-20 text-right tabular-nums font-extrabold text-white sm:w-28">
                       {formatCurrency(actual)}
                     </span>
                   </div>
@@ -163,7 +163,7 @@ export function ComparativaMesAnterior({ resumen, periodo }: ComparativaMesAnter
                         transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
                       />
                     </div>
-                    <span className="w-28 text-right tabular-nums font-bold text-gray-400">
+                    <span className="w-20 text-right tabular-nums font-bold text-gray-400 sm:w-28">
                       {formatCurrency(anterior)}
                     </span>
                   </div>

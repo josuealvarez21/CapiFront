@@ -13,6 +13,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { formatCurrency, getCategoryIcon } from '@/lib/utils';
+import LandingLogo from '@/components/landing/LandingLogo';
 import { floatAnimation } from '@/lib/motion';
 
 interface DashboardMockupProps {
@@ -112,10 +113,9 @@ export default function DashboardMockup({ reduceMotion }: DashboardMockupProps) 
 
             <div className="flex">
               <aside className="hidden w-40 shrink-0 border-r border-white/10 p-4 sm:block lg:w-48">
-                <p className="neon-text text-lg font-extrabold tracking-tight">Cápi</p>
-                <p className="mb-6 text-[8px] font-semibold uppercase tracking-widest text-gray-500">
-                  Hub financiero
-                </p>
+                <div className="mb-6">
+                  <LandingLogo compact />
+                </div>
                 <div className="space-y-2">
                   {sidebarItems.map(({ label, icon: Icon, active }) => (
                     <div
