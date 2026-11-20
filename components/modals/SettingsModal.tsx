@@ -2,6 +2,7 @@
 
 import Modal from './Modal';
 import Image from 'next/image';
+import { resolvePhotoUrl } from '@/lib/api';
 import type { UserData } from '@/lib/types';
 
 interface SettingsModalProps {
@@ -34,7 +35,7 @@ export default function SettingsModal({
   const previewSrc =
     profilePicUrl ||
     (profilePicFile ? URL.createObjectURL(profilePicFile) : null) ||
-    user.foto_perfil ||
+    resolvePhotoUrl(user.foto_perfil) ||
     `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=121212&color=fff`;
 
   return (
@@ -44,7 +45,7 @@ export default function SettingsModal({
           <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#3b82f6] to-[#22c55e] p-[2px] shadow-lg">
             <Image
               src={previewSrc}
-              alt="Preview"
+              alt={`Vista previa de la foto de ${user.nombre}`}
               width={96}
               height={96}
               unoptimized

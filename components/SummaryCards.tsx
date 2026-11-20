@@ -101,13 +101,13 @@ export default function SummaryCards({ summary }: SummaryCardsProps) {
               <Icon size={18} />
             </div>
           </div>
-          <h3
+          <h2
             className={`stat-value relative z-10 text-2xl font-extrabold tracking-tight sm:text-3xl ${
               key === 'balance' ? 'neon-text' : 'text-white'
             }`}
           >
             {formatCurrency(summary[field])}
-          </h3>
+          </h2>
           <div
             className="relative z-10 mt-3 h-1 w-full overflow-hidden rounded-full bg-white/5"
             aria-hidden="true"

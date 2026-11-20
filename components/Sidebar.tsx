@@ -16,6 +16,7 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { resolvePhotoUrl } from '@/lib/api';
 import type { TabType, UserData } from '@/lib/types';
 
 interface SidebarProps {
@@ -88,12 +89,12 @@ export default function Sidebar({
   const router = useRouter();
   const [avatarError, setAvatarError] = useState(false);
   const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=121212&color=fff`;
-  const avatarSrc = avatarError || !user.foto_perfil ? fallbackUrl : user.foto_perfil;
+  const avatarSrc = avatarError || !user.foto_perfil ? fallbackUrl : resolvePhotoUrl(user.foto_perfil);
   return (
     <aside className="w-60 lg:w-64 glass-soft border-r border-white/10 hidden md:flex flex-col z-10 sticky top-0 h-screen shadow-2xl">
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
         <div className="p-5 pb-3">
-          <h1 className="text-2xl lg:text-3xl font-extrabold neon-text">Cápi</h1>
+          <span className="block text-2xl lg:text-3xl font-extrabold neon-text" aria-label="Cápi">Cápi</span>
           <p className="text-[10px] lg:text-xs text-gray-400 mt-1 uppercase tracking-widest font-semibold">
             Hub Financiero
           </p>
@@ -103,7 +104,7 @@ export default function Sidebar({
           <div className="w-10 lg:w-12 h-10 lg:h-12 rounded-full bg-gradient-to-tr from-[#3b82f6] to-[#22c55e] p-[2px] shadow-lg shrink-0">
             <Image
               src={avatarSrc}
-              alt="Foto de perfil"
+              alt={`Foto de perfil de ${user.nombre}`}
               width={48}
               height={48}
               unoptimized

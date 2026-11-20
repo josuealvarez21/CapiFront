@@ -14,7 +14,7 @@ interface AuthContextType {
   user: AuthUser | null;
   token: string | null;
   rol: string | null;
-  login: (token: string) => void;
+  login: (token: string, refreshToken?: string) => void;
   logout: () => void;
   clearSession: () => void;
   loading: boolean;
@@ -39,18 +39,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const fetchUser = useCallback(async (t: string) => {
-    try {
-      const userData = await api.auth.me(t);
-      setUser(userData);
-      setRol(userData.rol);
-    } catch {
-      localStorage.removeItem('capi_token');
-      setToken(null);
-      setUser(null);
-      setRol(null);
-    }
+  const clearLocalSession = useCallback(() => {
+    localStorage.removeItem('capi_token');
+    localStorage.removeItem('capi_refresh_token');
+    setToken(null);
+    setUser(null);
+    setRol(null);
   }, []);
+
+  const fetchUser = useCallback(
+    async (t: string) => {
+      try {
+        const userData = await api.auth.me(t);
+        setUser(userData);
+        setRol(userData.rol);
+      } catch {
+        const refresh = localStorage.getItem('capi_refresh_token');
+        if (refresh) {
+          try {
+            const renewed = await api.auth.refresh(refresh);
+            localStorage.setItem('capi_token', renewed.access_token);
+            localStorage.setItem('capi_refresh_token', renewed.refresh_token);
+            setToken(renewed.access_token);
+            const userData = await api.auth.me(renewed.access_token);
+            setUser(userData);
+            setRol(userData.rol);
+            return;
+          } catch {
+            // Caemos a cierre de sesión.
+          }
+        }
+        clearLocalSession();
+      }
+    },
+    [clearLocalSession],
+  );
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -69,10 +92,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuth();
   }, [fetchUser]);
 
-  const login = (newToken: string) => {
+  const login = (newToken: string, refreshToken?: string) => {
     try {
       if (typeof window !== 'undefined') {
         localStorage.setItem('capi_token', newToken);
+        if (refreshToken) localStorage.setItem('capi_refresh_token', refreshToken);
       }
       const payload = decodeTokenPayload(newToken);
       setToken(newToken);
@@ -89,16 +113,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const clearSession = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('capi_token');
-    }
-    setToken(null);
-    setUser(null);
-    setRol(null);
-  }, []);
+    clearLocalSession();
+  }, [clearLocalSession]);
 
   const logout = () => {
     try {
+      if (token) api.auth.logout(token).catch(() => undefined);
       clearSession();
       router.replace('/login');
     } catch (err) {

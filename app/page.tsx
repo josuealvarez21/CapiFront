@@ -1,18 +1,35 @@
 import type { Metadata } from 'next';
 import Landing from '@/components/landing/Landing';
+import { landingFaq } from '@/lib/content/site-content';
 
 export const metadata: Metadata = {
-  title: 'Cápi — Controla tu destino financiero',
+  title: 'Finanzas personales: controla ingresos y gastos | Cápi',
   description:
-    'Gestiona ingresos, gastos, metas y presupuestos en un solo lugar. Con CapiBot, que también te entiende cuando le hablas.',
+    'Cápi reúne ingresos, gastos, metas y presupuestos en un solo lugar. Registra en segundos, entiende tus hábitos y decide mejor con CapiBot.',
+  alternates: { canonical: '/' },
   openGraph: {
-    title: 'Cápi — Controla tu destino financiero',
+    title: 'Finanzas personales: controla ingresos y gastos | Cápi',
     description: 'Tu hub financiero personal con asistente inteligente y reportes mensuales.',
-    locale: 'es_CO',
+    url: '/',
     type: 'website',
   },
 };
 
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: landingFaq.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+
 export default function HomePage() {
-  return <Landing />;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <Landing />
+    </>
+  );
 }

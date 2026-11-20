@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { fadeUp, viewportOnce } from '@/lib/motion';
+import { trackCta } from '@/lib/analytics';
 
 export default function FinalCTA() {
   return (
@@ -38,6 +39,7 @@ export default function FinalCTA() {
               <motion.div whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   href="/register"
+                  onClick={() => trackCta('final_cta', 'Crear cuenta gratis')}
                   className="group inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[#22c55e] px-6 py-4 text-sm font-black text-[#090d16] shadow-[0_10px_30px_-10px_rgba(34,197,94,0.8)] transition-all duration-300 hover:bg-[#16a34a] sm:w-auto"
                 >
                   Crear cuenta gratis

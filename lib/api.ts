@@ -10,6 +10,16 @@ import type {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+/** Las fotos nuevas son rutas relativas servidas por un endpoint autenticado. */
+export function resolvePhotoUrl(value?: string | null): string {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) {
+    // Fotos antiguas de localhost dejan de apuntar al servidor local.
+    return value.replace(/^http:\/\/localhost:8000/, API_BASE);
+  }
+  return `${API_BASE}/api/v1/users/photo/${value.split('/').pop()}`;
+}
+
 // =============================================
 // Core HTTP helper with auth and error handling
 // =============================================
@@ -119,14 +129,18 @@ export interface ReporteMensualCrudo {
 export const api = {
   // --- Auth ---
   auth: {
-    login: async (email: string, password: string) => {
+    login: async (email: string, password: string, antiBot?: { honeypot?: string; turnstileToken?: string }) => {
       const params = new URLSearchParams();
       params.append('username', email);
       params.append('password', password);
 
       const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Honeypot': antiBot?.honeypot || '',
+          'X-Turnstile-Token': antiBot?.turnstileToken || '',
+        },
         body: params.toString(),
       });
 
@@ -135,22 +149,76 @@ export const api = {
         throw new ApiError(errorData.detail || 'Credenciales incorrectas', response.status);
       }
 
-      return response.json() as Promise<{ access_token: string; token_type: string }>;
+      return response.json() as Promise<{ access_token: string; refresh_token: string; token_type: string }>;
     },
 
-    signup: async (nombre: string, email: string, password: string) => {
+    signup: async (
+      nombre: string,
+      email: string,
+      password: string,
+      antiBot?: { honeypot?: string; turnstileToken?: string },
+      turnstileToken?: string,
+    ) => {
       return apiRequest('/api/v1/auth/signup', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, email, password }),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Honeypot': antiBot?.honeypot || '',
+          'X-Turnstile-Token': antiBot?.turnstileToken || turnstileToken || '',
+        },
+        body: JSON.stringify({
+          nombre,
+          email,
+          password,
+          website: antiBot?.honeypot || '',
+        }),
       });
     },
 
-    forgotPassword: async (email: string) => {
-      return apiRequest(`/api/v1/auth/forgot-password?email=${encodeURIComponent(email)}`, {
+    refresh: (refreshToken: string) =>
+      apiRequest<{ access_token: string; refresh_token: string; token_type: string }>(
+        '/api/v1/auth/refresh',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+        },
+      ),
+
+    logout: (token: string) => apiRequest<void>('/api/v1/auth/logout', { method: 'POST', token }),
+
+    changePassword: (token: string, currentPassword: string, newPassword: string) =>
+      apiRequest<void>('/api/v1/auth/change-password', {
         method: 'POST',
+        token,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+      }),
+
+    forgotPassword: async (
+      email: string,
+      antiBot?: { honeypot?: string; turnstileToken?: string },
+    ) => {
+      return apiRequest('/api/v1/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Turnstile-Token': antiBot?.turnstileToken || '',
+        },
+        body: JSON.stringify({
+          email,
+          website: antiBot?.honeypot || '',
+          turnstile_token: antiBot?.turnstileToken || null,
+        }),
       });
     },
+
+    resetPassword: (token: string, newPassword: string) =>
+      apiRequest<void>('/api/v1/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, new_password: newPassword }),
+      }),
 
     me: (token: string) =>
       apiRequest<{ id_usuario: number; nombre: string; email: string; rol: string }>(
@@ -169,7 +237,7 @@ export const api = {
         throw new ApiError(errorData.detail || 'Error al autenticar con Google', response.status);
       }
 
-      return response.json() as Promise<{ access_token: string; token_type: string }>;
+      return response.json() as Promise<{ access_token: string; refresh_token: string; token_type: string }>;
     },
   },
 

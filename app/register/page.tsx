@@ -5,6 +5,8 @@ import { Mail, Lock, User, Sparkles, LogIn, ShieldCheck, Eye, EyeOff } from 'luc
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
+import { trackEvent } from '@/lib/analytics';
+import TurnstileField from '@/components/security/TurnstileField';
 
 export default function RegisterPage() {
   const [nombre, setNombre] = useState('');
@@ -22,6 +24,8 @@ export default function RegisterPage() {
   const [mostrarConfirmarPassword, setMostrarConfirmarPassword] = useState(false);
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
   const [exito, setExito] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const router = useRouter();
 
   const validarCampoNombre = (valor: string): string | undefined => {
@@ -85,7 +89,8 @@ export default function RegisterPage() {
     setErrores({});
 
     try {
-      await api.auth.signup(nombre.trim(), email.trim(), password);
+      await api.auth.signup(nombre.trim(), email.trim(), password, { honeypot, turnstileToken });
+      trackEvent('signup_success', { method: 'password' });
       setExito(true);
     } catch (error) {
       if (error instanceof ApiError) {
@@ -152,6 +157,17 @@ export default function RegisterPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+          <input
+            type="text"
+            name="website"
+            autoComplete="off"
+            tabIndex={-1}
+            aria-hidden="true"
+            className="hidden"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+          />
+          <TurnstileField onToken={setTurnstileToken} />
           {errorGeneral && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4">
               <p className="text-red-400 text-sm font-medium text-center">{errorGeneral}</p>

@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import DashboardMockup from '@/components/landing/DashboardMockup';
+import KeyPoints from '@/components/landing/KeyPoints';
+import { landingTakeaways } from '@/lib/content/site-content';
 import { fadeUp, stagger } from '@/lib/motion';
+import { trackCta } from '@/lib/analytics';
 
 interface HeroProps {
   reduceMotion: boolean;
@@ -42,6 +45,10 @@ export default function Hero({ reduceMotion }: HeroProps) {
           incluso cuando le hablas.
         </motion.p>
 
+        <motion.div variants={fadeUp}>
+          <KeyPoints items={landingTakeaways} />
+        </motion.div>
+
         <motion.div
           variants={fadeUp}
           className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
@@ -49,6 +56,7 @@ export default function Hero({ reduceMotion }: HeroProps) {
           <motion.div whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
             <Link
               href="/register"
+              onClick={() => trackCta('hero', 'Crear cuenta gratis')}
               className="group inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[#22c55e] px-6 py-4 text-sm font-black text-[#090d16] shadow-[0_10px_30px_-10px_rgba(34,197,94,0.8)] transition-all duration-300 hover:bg-[#16a34a] hover:shadow-[0_14px_36px_-10px_rgba(34,197,94,0.9)] sm:w-auto"
             >
               Crear cuenta gratis

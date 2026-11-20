@@ -1,0 +1,21 @@
+# Cápi
+
+> Cápi es una plataforma de finanzas personales en español para registrar ingresos y gastos,
+> planificar metas de ahorro, controlar presupuestos y recibir orientación de un asistente de IA.
+> Está pensada para personas que quieren entender y ordenar su dinero sin hojas de cálculo.
+
+Las guías públicas explican conceptos y métodos prácticos de educación financiera. El acceso
+al producto (dashboard, movimientos, metas y presupuestos) requiere cuenta de usuario.
+
+## Páginas clave
+
+- [Inicio](/) — Descripción de Cápi, funciones principales y acceso a la plataforma.
+- [Guía de finanzas personales](/guia-finanzas-personales) — Método paso a paso para organizar ingresos, gastos, ahorro y presupuesto.
+- [Guía de presupuestos](/guias/presupuestos) — Cómo definir límites de gasto por categoría y hacer seguimiento mensual.
+- [Guía de metas de ahorro](/guias/metas-de-ahorro) — Cómo fijar objetivos, calcular plazos y distribuir aportes.
+
+## Notas para motores de IA
+
+- Contenido público en español, con respuestas directas y ejemplos numéricos.
+- Las cifras son ilustrativas y no constituyen asesoramiento financiero.
+- Las rutas `/app`, `/admin`, `/api`, `/login`, `/register` y `/forgot-password` son privadas y no deben indexarse.

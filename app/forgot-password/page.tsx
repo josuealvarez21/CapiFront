@@ -4,22 +4,27 @@ import { motion } from 'framer-motion';
 import { Mail, Key, ArrowLeft, Send } from 'lucide-react';
 import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
+import { trackEvent } from '@/lib/analytics';
+import TurnstileField from '@/components/security/TurnstileField';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isSent, setIsSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [honeypot, setHoneypot] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await api.auth.forgotPassword(email);
+      await api.auth.forgotPassword(email, { honeypot, turnstileToken });
+      trackEvent('password_reset_requested', {});
       setIsSent(true);
     } catch (error) {
       if (error instanceof ApiError) {
-        alert('No encontramos ninguna cuenta con ese correo');
+        alert(error.message || 'No se pudo procesar la solicitud');
       } else {
         alert('Error de conexión');
       }
@@ -74,6 +79,17 @@ export default function ForgotPasswordPage() {
           </motion.div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
+            <input
+              type="text"
+              name="website"
+              autoComplete="off"
+              tabIndex={-1}
+              aria-hidden="true"
+              className="hidden"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+            />
+            <TurnstileField onToken={setTurnstileToken} />
             <div className="space-y-2">
               <label className="text-[11px] font-black text-gray-500 uppercase tracking-[2px] ml-1">
                 Tu Correo Registrado

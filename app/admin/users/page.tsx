@@ -177,11 +177,14 @@ export default function AdminUsers() {
   const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
+    // Reinicio de paginación al cambiar el filtro (comportamiento existente).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(0);
   }, [rolFilter]);
 
   useEffect(() => {
     if (!token) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     const skip = page * PAGE_SIZE;
     api.admin.listUsers(token, { ...(rolFilter ? { rol: rolFilter } : {}), skip, limit: PAGE_SIZE + 1 })
