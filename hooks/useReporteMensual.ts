@@ -129,12 +129,15 @@ export function useReporteMensual() {
 
   useEffect(() => {
     if (!authLoading && token) {
+      // Carga inicial de datos del periodo (comportamiento existente).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchAnios();
     }
   }, [authLoading, token, fetchAnios]);
 
   useEffect(() => {
     if (!authLoading && token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchReporte();
     }
   }, [authLoading, token, fetchReporte]);

@@ -15,7 +15,9 @@ export function useChat(onDataChange?: () => void) {
   const abortRef = useRef<AbortController | null>(null);
   const streamRef = useRef<ReadableStreamDefaultReader | null>(null);
   const onDataChangeRef = useRef(onDataChange);
-  onDataChangeRef.current = onDataChange;
+  useEffect(() => {
+    onDataChangeRef.current = onDataChange;
+  }, [onDataChange]);
 
   const addMessage = useCallback((role: 'user' | 'assistant', content: string) => {
     const msg: ChatMessage = {

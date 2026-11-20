@@ -218,9 +218,9 @@ export default function SinglePageApp() {
                 className="glass-card rounded-3xl p-5"
               >
                 <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-                  <h3 className="text-lg font-extrabold tracking-tight neon-text">
+                  <h2 className="text-lg font-extrabold tracking-tight neon-text">
                     Últimos Movimientos
-                  </h3>
+                  </h2>
                   <select
                     aria-label="Filtrar movimientos por mes"
                     value={monthFilter}

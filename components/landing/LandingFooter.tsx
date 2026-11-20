@@ -5,6 +5,9 @@ const anchors = [
   { href: '#funciones', label: 'Funciones' },
   { href: '#como-funciona', label: 'Cómo funciona' },
   { href: '#demo', label: 'Demo' },
+  { href: '/guia-finanzas-personales', label: 'Guía de finanzas' },
+  { href: '/guias/presupuestos', label: 'Presupuestos' },
+  { href: '/guias/metas-de-ahorro', label: 'Metas de ahorro' },
 ];
 
 export default function LandingFooter() {

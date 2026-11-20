@@ -48,23 +48,36 @@ function cleanNumber(num: string): string {
   return n;
 }
 
+function errorInfo(error: unknown): { name: string; message: string } {
+  if (error instanceof DOMException) {
+    return { name: error.name, message: error.message };
+  }
+  if (error instanceof Error) {
+    return { name: error.name, message: error.message };
+  }
+  return { name: '', message: 'Error inesperado.' };
+}
+
+function hasMicSupport(): boolean {
+  return typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
+}
+
+function hasSpeechSupport(): boolean {
+  return typeof window !== 'undefined' && !!window.speechSynthesis;
+}
+
 export function useVoice() {
   const { token } = useAuth();
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isMicSupported, setIsMicSupported] = useState(false);
-  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+  const [isMicSupported] = useState(hasMicSupport);
+  const [isSpeechSupported] = useState(hasSpeechSupport);
   const [micError, setMicError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    setIsMicSupported(!!navigator.mediaDevices?.getUserMedia);
-    setIsSpeechSupported(!!window.speechSynthesis);
-  }, []);
 
   useEffect(() => {
     const loadVoices = () => {
@@ -132,8 +145,8 @@ export function useVoice() {
           if (result.text) {
             onResult(result.text);
           }
-        } catch (e: any) {
-          setMicError(e.message || 'Error al transcribir el audio.');
+        } catch (e: unknown) {
+          setMicError(errorInfo(e).message || 'Error al transcribir el audio.');
         }
       };
 
@@ -147,13 +160,14 @@ export function useVoice() {
       mediaRecorderRef.current = recorder;
       recorder.start();
       setIsListening(true);
-    } catch (e: any) {
-      if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+    } catch (e: unknown) {
+      const { name, message } = errorInfo(e);
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
         setMicError('Permiso del micrófono denegado.');
-      } else if (e.name === 'NotFoundError') {
+      } else if (name === 'NotFoundError') {
         setMicError('No se encontró micrófono.');
       } else {
-        setMicError(`Error: ${e.message}`);
+        setMicError(`Error: ${message}`);
       }
     }
   }, [token]);

@@ -16,7 +16,7 @@ export default function GoogleLoginButton({
       setIsLoading(true);
       try {
         const data = await api.auth.googleLogin(tokenResponse.access_token);
-        login(data.access_token);
+        login(data.access_token, data.refresh_token);
       } catch (error) {
         if (error instanceof ApiError) {
           alert(error.message);

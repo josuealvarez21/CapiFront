@@ -63,7 +63,7 @@ CapiFront es la interfaz de usuario de la aplicación Cápi. Ofrece:
    # Edita .env.local con la URL del backend y tu Google Client ID
    ```
 
-   > **Nota**: Next.js usa `.env.local` para variables de entorno locales. El Google Client ID debe ser un Web OAuth 2.0 Client registrado en [Google Cloud Console](https://console.cloud.google.com/apis/credentials) con `http://localhost:3000` como **Origen JavaScript autorizado**.
+   > **Nota**: Next.js usa `.env.local`. Además de la URL del backend y el Google Client ID, configura `NEXT_PUBLIC_SITE_URL` (canonical/sitemap), `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `GSC_VERIFICATION_TOKEN` cuando aplique. Ver `PLAN_DE_DESPLIEGUE.md` en la raíz del workspace. El Google Client ID debe ser un Web OAuth 2.0 Client registrado en [Google Cloud Console](https://console.cloud.google.com/apis/credentials) con tu dominio como **Origen JavaScript autorizado**.
 
 4. **Ejecutar en modo desarrollo**
    ```bash
@@ -83,7 +83,7 @@ CapiFront es la interfaz de usuario de la aplicación Cápi. Ofrece:
 1. **Registro**: Navega a `/register` para crear una cuenta.
 2. **Login**: Inicia sesión en `/login` con email/password o Google.
 
-> **Admin predefinido**: `admin.capi@gmail.com` / `Admin123!` (rol `admin`)
+> No hay cuentas predefinidas: crea la tuya en `/register`. El primer administrador se crea desde el backend con variables de entorno (ver `CapiBackend/README.md`).
 
 3. **Dashboard**: Accede al panel principal en `/` donde verás:
    - Resumen financiero (balance, ingresos, gastos del mes)

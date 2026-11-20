@@ -8,7 +8,6 @@ import { api, UnauthorizedError } from '@/lib/api';
 import { getTodayISO, getCurrentMonthISO } from '@/lib/utils';
 import type {
   DashboardData,
-  CategoriaBackend,
   TabType,
   ModalMovementType,
   SavingsDistributionMode,
@@ -36,7 +35,8 @@ export function useDashboard() {
   // Profile form
   const [profilePicUrl, setProfilePicUrl] = useState('');
   const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
-  const [profileName, setProfileName] = useState('');
+  // null = usar el nombre del servidor; string = nombre editado en el modal.
+  const [profileNameDraft, setProfileNameDraft] = useState<string | null>(null);
   const [isUploadingProfilePic, setIsUploadingProfilePic] = useState(false);
 
   // Movement form
@@ -102,7 +102,7 @@ export function useDashboard() {
     },
   });
 
-  const { data: categoriesData, isLoading: categoriesLoading, refetch: refetchCategories } = useQuery({
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
     queryKey: CATEGORIES_QUERY_KEY,
     queryFn: async () => {
       if (!token) throw new Error('No token');
@@ -116,13 +116,6 @@ export function useDashboard() {
       return failureCount < 1;
     },
   });
-
-  // Sync profile name from dashboard data
-  useEffect(() => {
-    if (dashboardData?.user?.nombre) {
-      setProfileName(dashboardData.user.nombre);
-    }
-  }, [dashboardData]);
 
   // --- Mutations with Optimistic Updates ---
 
@@ -369,6 +362,7 @@ export function useDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
+      setProfileNameDraft(null);
       setIsUploadingProfilePic(false);
     },
     onError: (err) => {
@@ -426,6 +420,8 @@ export function useDashboard() {
     setIsBudgetModalOpen(false);
     setBudgetFormData({ id_categoria: '', limite: '', fecha_mes: getCurrentMonthISO() });
   };
+
+  const profileName = profileNameDraft ?? dashboardData?.user?.nombre ?? '';
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -511,7 +507,7 @@ export function useDashboard() {
     profilePicFile,
     setProfilePicFile,
     profileName,
-    setProfileName,
+    setProfileName: setProfileNameDraft,
     isUploadingProfilePic,
     // Savings
     savingsPercentage,

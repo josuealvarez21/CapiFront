@@ -16,6 +16,8 @@ import {
 import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
 import { api, ApiError } from '@/lib/api';
+import { trackEvent } from '@/lib/analytics';
+import TurnstileField from '@/components/security/TurnstileField';
 
 const GoogleLoginButton = lazy(() => import('@/components/GoogleLoginButton'));
 
@@ -28,6 +30,8 @@ export default function LoginPage() {
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [errores, setErrores] = useState<{ email?: string; password?: string }>({});
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const { login } = useAuth();
 
   const validarCampoEmail = (valor: string): string | undefined => {
@@ -71,8 +75,12 @@ export default function LoginPage() {
     setErrores({});
 
     try {
-      const data = await api.auth.login(email.trim(), password.trim());
-      login(data.access_token);
+      const data = await api.auth.login(email.trim(), password.trim(), {
+        honeypot,
+        turnstileToken,
+      });
+      trackEvent('login_success', { method: 'password' });
+      login(data.access_token, data.refresh_token);
     } catch (error) {
       if (error instanceof ApiError) {
         setErrorGeneral(error.message);
@@ -148,6 +156,17 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+            <input
+              type="text"
+              name="website"
+              autoComplete="off"
+              tabIndex={-1}
+              aria-hidden="true"
+              className="hidden"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+            />
+            <TurnstileField onToken={setTurnstileToken} />
             {errorGeneral && (
               <motion.div
                 initial={{ opacity: 0, y: -6 }}
