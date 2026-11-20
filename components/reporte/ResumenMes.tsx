@@ -137,8 +137,8 @@ export function ResumenMes({ resumen, periodo }: ResumenMesProps) {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="glass-soft rounded-2xl px-5 py-4 border border-white/10 text-center">
+          <div className="flex shrink-0 flex-wrap items-center gap-2 sm:gap-3">
+            <div className="glass-soft rounded-2xl border border-white/10 px-3 py-3 text-center sm:px-5 sm:py-4">
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">
                 Tasa de Ahorro
               </p>
@@ -151,7 +151,7 @@ export function ResumenMes({ resumen, periodo }: ResumenMesProps) {
               </p>
             </div>
 
-            <div className="glass-soft rounded-2xl px-5 py-4 border border-white/10 text-center">
+            <div className="glass-soft rounded-2xl border border-white/10 px-3 py-3 text-center sm:px-5 sm:py-4">
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">
                 Movimientos
               </p>

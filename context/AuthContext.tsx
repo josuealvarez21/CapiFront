@@ -16,6 +16,7 @@ interface AuthContextType {
   rol: string | null;
   login: (token: string) => void;
   logout: () => void;
+  clearSession: () => void;
   loading: boolean;
   setUser: (user: AuthUser | null) => void;
 }
@@ -87,14 +88,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const clearSession = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('capi_token');
+    }
+    setToken(null);
+    setUser(null);
+    setRol(null);
+  }, []);
+
   const logout = () => {
     try {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('capi_token');
-      }
-      setToken(null);
-      setUser(null);
-      setRol(null);
+      clearSession();
       router.replace('/login');
     } catch (err) {
       console.error('Error clearing session:', err);
@@ -102,7 +107,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, rol, login, logout, loading, setUser }}>
+    <AuthContext.Provider value={{ user, token, rol, login, logout, clearSession, loading, setUser }}>
       {children}
     </AuthContext.Provider>
   );

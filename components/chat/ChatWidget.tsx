@@ -32,17 +32,16 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 z-50 flex w-96 max-w-[calc(100vw-2rem)] flex-col rounded-2xl glass-card border border-white/10"
-            style={{ maxHeight: '70vh' }}
+            className="fixed inset-x-2 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-50 flex h-[min(70dvh,34rem)] max-h-[calc(100dvh-7rem)] flex-col rounded-2xl glass-card border border-white/10 md:inset-x-auto md:bottom-24 md:right-6 md:h-auto md:w-96 md:max-h-[70vh]"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            <div className="flex items-center justify-between border-b border-white/10 px-3 py-3 sm:px-4">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#3b82f6] to-[#22c55e] text-sm font-bold text-white">
                   C
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">CapiBot</p>
+                  <p className="text-sm font-extrabold neon-text">CapiBot</p>
                   <p className="text-xs text-zinc-500">Asistente financiero</p>
                 </div>
               </div>
@@ -57,6 +56,7 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
                 )}
                 <button
                   onClick={toggleOpen}
+                  aria-label="Cerrar CapiBot"
                   className="rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-white/5 hover:text-white"
                 >
                   <X size={18} />
@@ -65,7 +65,7 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4 custom-scrollbar">
+            <div className="flex-1 space-y-3 overflow-y-auto px-3 py-4 custom-scrollbar sm:px-4">
               {messages.length === 0 && !isLoading && (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#3b82f6]/20 to-[#22c55e]/20">
@@ -103,7 +103,7 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
             </div>
 
             {/* Input */}
-            <div className="border-t border-white/10 px-4 py-3">
+            <div className="border-t border-white/10 px-3 py-3 sm:px-4">
               <ChatInput
                 onSend={sendMessage}
                 onStop={stopStreaming}
@@ -119,7 +119,10 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
         onClick={toggleOpen}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#3b82f6] to-[#22c55e] text-white shadow-xl shadow-blue-900/40 transition-all hover:shadow-[0_0_30px_-6px_rgba(59,130,246,0.7)]"
+        aria-label={isOpen ? 'Cerrar CapiBot' : 'Abrir CapiBot'}
+        className={`fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-50 h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#3b82f6] to-[#22c55e] text-white shadow-xl shadow-blue-900/40 transition-all hover:shadow-[0_0_30px_-6px_rgba(59,130,246,0.7)] md:bottom-6 md:right-6 ${
+          isOpen ? 'hidden md:flex' : 'flex'
+        }`}
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
       </motion.button>

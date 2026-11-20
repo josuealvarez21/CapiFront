@@ -22,6 +22,12 @@ export const tabSwap: Variants = {
   exit: { opacity: 0, y: -12, transition: { duration: 0.25, ease: 'easeIn' } },
 };
 
+export const scaleIn: Variants = {
+  hidden: { opacity: 0, scale: 0.94, y: 8 },
+  show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } },
+  exit: { opacity: 0, scale: 0.96, y: 8, transition: { duration: 0.18, ease: 'easeIn' } },
+};
+
 export const viewportOnce = { once: true, amount: 0.2 } as const;
 
 /** Flotación continua del mockup; se desactiva con prefers-reduced-motion. */

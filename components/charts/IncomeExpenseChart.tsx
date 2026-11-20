@@ -33,11 +33,16 @@ const MONTH_INDEX: Record<string, number> = {
 };
 
 function parseDate(value: string): number | null {
-  const isoMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const trimmed = value.trim();
+  const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (isoMatch) {
     return Date.UTC(Number(isoMatch[1]), Number(isoMatch[2]) - 1, Number(isoMatch[3]));
   }
-  const prettyMatch = value.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})$/);
+  const slashMatch = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (slashMatch) {
+    return Date.UTC(Number(slashMatch[3]), Number(slashMatch[2]) - 1, Number(slashMatch[1]));
+  }
+  const prettyMatch = trimmed.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})$/);
   if (prettyMatch) {
     const month = MONTH_INDEX[prettyMatch[2]];
     if (month !== undefined) {
@@ -54,20 +59,18 @@ function toKey(ms: number): string {
   ).padStart(2, '0')}`;
 }
 
-const MAX_RANGE_DAYS = 92;
+const VENTANA_DIAS = 14;
+const DIA_MS = 86_400_000;
 
 function buildFlujoSeries(movements: Transaccion[]) {
-  const todayMs = Date.now();
-  const todayKey = toKey(todayMs);
-
   const buckets = new Map<string, { ingresos: number; gastos: number }>();
-  let minKey = todayKey;
+  let lastMs = Date.now();
 
   for (const m of movements) {
     const ms = parseDate(m.fecha);
     if (ms === null) continue;
+    if (ms > lastMs) lastMs = ms;
     const key = toKey(ms);
-    if (key < minKey) minKey = key;
     const bucket = buckets.get(key) ?? { ingresos: 0, gastos: 0 };
     if (m.tipo === 'ingreso') bucket.ingresos += Number(m.monto);
     else bucket.gastos += Number(m.monto);
@@ -75,25 +78,28 @@ function buildFlujoSeries(movements: Transaccion[]) {
   }
 
   const series: { dia: string; ingresos: number; gastos: number }[] = [];
-  const cursor = new Date(`${minKey}T00:00:00Z`);
-  const last = new Date(`${todayKey}T00:00:00Z`);
-  let guard = 0;
-
-  while (cursor.getTime() <= last.getTime() && guard < MAX_RANGE_DAYS) {
-    const key = toKey(cursor.getTime());
+  for (let i = VENTANA_DIAS - 1; i >= 0; i--) {
+    const dayMs = lastMs - i * DIA_MS;
+    const key = toKey(dayMs);
+    const date = new Date(dayMs);
     const bucket = buckets.get(key);
     series.push({
-      dia: `${String(cursor.getUTCDate()).padStart(2, '0')}/${String(
-        cursor.getUTCMonth() + 1,
+      dia: `${String(date.getUTCDate()).padStart(2, '0')}/${String(
+        date.getUTCMonth() + 1,
       ).padStart(2, '0')}`,
       ingresos: bucket?.ingresos ?? 0,
       gastos: bucket?.gastos ?? 0,
     });
-    cursor.setUTCDate(cursor.getUTCDate() + 1);
-    guard++;
   }
 
   return series;
+}
+
+function compactCurrency(value: number): string {
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `$${Math.round(value / 1_000)}k`;
+  return `$${value}`;
 }
 
 export default function IncomeExpenseChart({ summary, movements }: IncomeExpenseChartProps) {
@@ -130,7 +136,7 @@ export default function IncomeExpenseChart({ summary, movements }: IncomeExpense
       <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-[#3b82f6] blur-3xl opacity-10 pointer-events-none" />
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 relative z-10">
         <div className="flex items-center gap-2">
-          <h3 className="text-lg font-bold text-white">Ingresos vs Gastos</h3>
+          <h3 className="text-lg font-extrabold tracking-tight neon-text">Ingresos vs Gastos</h3>
           <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
             <span className="h-1.5 w-6 rounded-full bg-gradient-to-r from-[#22c55e] to-[#ef4444]" />
             Flujo Mensual
@@ -174,6 +180,12 @@ export default function IncomeExpenseChart({ summary, movements }: IncomeExpense
           <div className="h-64 w-full max-w-md">
             <ResponsiveContainer width="99%" height={256}>
               <PieChart>
+                <defs>
+                  <linearGradient id="balanceGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#22c55e" />
+                  </linearGradient>
+                </defs>
                 <Pie
                   data={chartData}
                   cx="50%"
@@ -192,7 +204,7 @@ export default function IncomeExpenseChart({ summary, movements }: IncomeExpense
                   <Label
                     value={formatCurrency(summary.balance_total)}
                     position="center"
-                    fill="#ffffff"
+                    fill="url(#balanceGrad)"
                     style={{ fontSize: '17px', fontWeight: 800 }}
                   />
                   {chartData.map((entry, index) => (
@@ -221,7 +233,7 @@ export default function IncomeExpenseChart({ summary, movements }: IncomeExpense
       ) : (
         <div className="relative z-10 flex flex-col">
           <span className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Flujo Reciente
+            Últimos {VENTANA_DIAS} días
           </span>
           <div className="h-64 w-full">
             <ResponsiveContainer width="99%" height={256}>
@@ -235,6 +247,10 @@ export default function IncomeExpenseChart({ summary, movements }: IncomeExpense
                     <stop offset="0%" stopColor={RED} stopOpacity={0.35} />
                     <stop offset="100%" stopColor={RED} stopOpacity={0} />
                   </linearGradient>
+                  <linearGradient id="flowStrokeIngresos" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#22c55e" />
+                  </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="4 4" stroke="rgba(255,255,255,0.06)" vertical={false} />
                 <XAxis
@@ -242,24 +258,28 @@ export default function IncomeExpenseChart({ summary, movements }: IncomeExpense
                   tick={{ fill: '#9ca3af', fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
+                  interval="preserveStartEnd"
+                  minTickGap={24}
                 />
                 <YAxis
                   tick={{ fill: '#9ca3af', fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(v: number) => `$${v}`}
+                  tickFormatter={compactCurrency}
+                  width={52}
                 />
                 <Tooltip formatter={(value: unknown) => formatCurrency(Number(value))} contentStyle={tooltipStyle} itemStyle={{ color: '#fff' }} />
                 <Area
                   type="monotone"
                   dataKey="ingresos"
                   name="Ingresos"
-                  stroke={GREEN}
+                  stroke="url(#flowStrokeIngresos)"
                   strokeWidth={2.5}
                   fill="url(#flowGradIngresos)"
                   animationBegin={250}
                   animationDuration={1200}
-                  activeDot={{ r: 4, fill: GREEN }}
+                  dot={{ r: 2.5, strokeWidth: 0, fill: GREEN }}
+                  activeDot={{ r: 5, fill: GREEN }}
                 />
                 <Area
                   type="monotone"
@@ -270,10 +290,21 @@ export default function IncomeExpenseChart({ summary, movements }: IncomeExpense
                   fill="url(#flowGradGastos)"
                   animationBegin={400}
                   animationDuration={1200}
-                  activeDot={{ r: 4, fill: RED }}
+                  dot={{ r: 2.5, strokeWidth: 0, fill: RED }}
+                  activeDot={{ r: 5, fill: RED }}
                 />
               </AreaChart>
             </ResponsiveContainer>
+          </div>
+          <div className="mt-3 flex flex-wrap justify-center gap-2">
+            <div className="flex items-center gap-2 glass-soft px-3 py-1.5 rounded-full">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: GREEN }} />
+              <span className="text-xs font-bold text-gray-300">Ingresos</span>
+            </div>
+            <div className="flex items-center gap-2 glass-soft px-3 py-1.5 rounded-full">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: RED }} />
+              <span className="text-xs font-bold text-gray-300">Gastos</span>
+            </div>
           </div>
         </div>
       )}

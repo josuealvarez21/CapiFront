@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LandingLogo from '@/components/landing/LandingLogo';
 
 const anchors = [
   { href: '#funciones', label: 'Funciones' },
@@ -10,12 +11,9 @@ export default function LandingFooter() {
   return (
     <footer className="border-t border-white/10 bg-[#0a0e17]/60 px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 md:flex-row">
-        <div>
-          <p className="neon-text text-2xl font-extrabold tracking-tight">Cápi</p>
-          <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
-            Hub Financiero
-          </p>
-        </div>
+        <Link href="/" aria-label="Cápi, inicio" className="rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3b82f6]">
+          <LandingLogo />
+        </Link>
 
         <nav
           aria-label="Pie de página"

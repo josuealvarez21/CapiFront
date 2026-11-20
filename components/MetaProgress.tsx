@@ -37,10 +37,10 @@ export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: Me
     <div
       className={`mb-3 glass-soft p-4 rounded-2xl border transition-all duration-500 relative overflow-hidden group ${isCompleted ? 'border-[#22c55e]/50 shadow-[0_0_25px_rgba(34,197,94,0.12)]' : 'border-white/10 hover:border-[#3b82f6]/40'}`}
     >
-      <div className="flex justify-between mb-3 relative z-10">
-        <div className="flex flex-col">
-          <span className="text-white font-bold tracking-wide flex items-center gap-2">
-            {meta.nombre}
+      <div className="relative z-10 mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+        <div className="flex min-w-0 flex-col">
+          <span className="flex min-w-0 items-center gap-2 font-bold tracking-wide text-white">
+            <span className="truncate">{meta.nombre}</span>
             {isCompleted && (
               <span className="text-[#22c55e] text-[10px] bg-[#22c55e]/15 px-2 py-0.5 rounded-full uppercase border border-[#22c55e]/25">
                 Completada
@@ -53,8 +53,8 @@ export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: Me
             </span>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-gray-400 text-sm font-medium mr-2">
+        <div className="flex shrink-0 items-center justify-between gap-2 sm:justify-end sm:gap-3">
+          <span className="mr-2 whitespace-nowrap text-xs font-medium text-gray-400 sm:text-sm">
             <span className="text-white">
               {formatCurrency(Number(meta.ahorro_actual || 0) + Number(projectedAmount || 0))}
             </span>{' '}
@@ -62,7 +62,8 @@ export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: Me
           </span>
           <button
             onClick={() => onDelete(meta.id)}
-            className="text-gray-500 hover:text-red-400 transition-colors p-1"
+            aria-label={`Eliminar meta ${meta.nombre}`}
+            className="shrink-0 p-1 text-gray-500 transition-colors hover:text-red-400"
           >
             <Trash2 size={16} />
           </button>
@@ -81,7 +82,7 @@ export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: Me
           style={{ backgroundColor: !isCompleted ? color : undefined }}
         />
       </div>
-      <div className="flex justify-between items-center mt-2">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <span
           className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${willBeCompleted ? 'bg-[#22c55e] text-[#090d16]' : 'bg-[#22c55e]/15 text-[#4ade80] border border-[#22c55e]/25'}`}
         >
@@ -91,7 +92,7 @@ export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: Me
           % {willBeCompleted ? 'Logrado' : 'Proyectado'}
         </span>
         {projectedAmount > 0 && !isCompleted && (
-          <span className="text-[#22c55e] text-xs font-bold animate-pulse">
+          <span className="text-[11px] font-bold text-[#22c55e] animate-pulse sm:text-xs">
             +{formatCurrency(projectedAmount)} proyectados
           </span>
         )}
