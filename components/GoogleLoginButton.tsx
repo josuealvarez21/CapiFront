@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { Globe } from 'lucide-react';
 import { api, ApiError } from '@/lib/api';
@@ -10,33 +11,42 @@ export default function GoogleLoginButton({
   setIsLoading: (v: boolean) => void;
 }) {
   const { login } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setIsLoading(true);
+      setError(null);
       try {
         const data = await api.auth.googleLogin(tokenResponse.access_token);
         login(data.access_token, data.refresh_token);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          alert(error.message);
-        } else {
-          alert('Error al iniciar sesión con Google');
-        }
+      } catch (err) {
+        setError(
+          err instanceof ApiError
+            ? err.message
+            : 'No pudimos iniciar sesión con Google. Inténtalo de nuevo.'
+        );
       } finally {
         setIsLoading(false);
       }
     },
-    onError: () => alert('Error al iniciar sesión con Google'),
+    onError: () => setError('No pudimos iniciar sesión con Google. Inténtalo de nuevo.'),
   });
 
   return (
-    <button
-      type="button"
-      onClick={() => googleLogin()}
-      className="w-full bg-white text-black hover:bg-gray-100 py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-    >
-      <Globe size={22} /> Google
-    </button>
+    <div className="space-y-2">
+      <button
+        type="button"
+        onClick={() => googleLogin()}
+        className="flex w-full items-center justify-center gap-3 rounded-2xl bg-white py-4 text-lg font-black text-black transition-all hover:bg-gray-100 active:scale-[0.98]"
+      >
+        <Globe size={22} /> Google
+      </button>
+      {error && (
+        <p role="alert" className="text-center text-xs font-medium text-red-400">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

@@ -114,7 +114,7 @@ export default function Sidebar({
           </div>
           <div className="overflow-hidden min-w-0">
             <p className="text-white font-bold text-sm truncate">{user.nombre}</p>
-            <p className="text-[10px] lg:text-xs text-[#22c55e] font-semibold">Cápi Pro</p>
+            <p className="text-[10px] lg:text-xs text-[#22c55e] font-semibold">Cuenta personal</p>
           </div>
         </div>
 

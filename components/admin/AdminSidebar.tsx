@@ -61,7 +61,7 @@ export default function AdminSidebar() {
         <div>
           <div className="border-b border-white/10 px-6 pb-5 pt-6">
             <div className="flex items-center gap-2.5">
-              <span className="neon-text text-3xl font-black leading-none">C</span>
+              <span className="neon-text text-2xl font-black leading-none">Cápi</span>
               <div>
                 <p className="text-xl font-extrabold tracking-tight text-white">Admin</p>
                 <p className="eyebrow mt-0.5 text-gray-500">Panel de Control</p>
