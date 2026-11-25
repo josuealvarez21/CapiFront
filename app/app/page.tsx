@@ -473,7 +473,12 @@ export default function SinglePageApp() {
         </div>
       </main>
 
-      <BottomNav currentTab={currentTab} onTabChange={setCurrentTab} />
+      <BottomNav
+        currentTab={currentTab}
+        onTabChange={setCurrentTab}
+        onOpenSettings={() => setIsSettingsModalOpen(true)}
+        onLogout={logout}
+      />
 
       {/* MODALS */}
       <MovementModal
