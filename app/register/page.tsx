@@ -122,7 +122,7 @@ export default function RegisterPage() {
           <p className="text-gray-400 mb-8">Ya puedes iniciar sesión con tu correo y contraseña.</p>
           <button
             onClick={() => router.push('/login')}
-            className="bg-gradient-to-r from-[#22c55e] to-[#16a34a] text-[#090d16] py-4 px-8 rounded-2xl font-black text-lg transition-all hover:shadow-[0_8px_24px_-8px_rgba(34,197,94,0.5)] active:scale-[0.98]"
+            className="bg-gradient-to-r from-[#22c55e] to-[#16a34a] text-white py-4 px-8 rounded-2xl font-black text-lg transition-all hover:shadow-[0_8px_24px_-8px_rgba(34,197,94,0.5)] active:scale-[0.98]"
           >
             Ir a Iniciar Sesión
           </button>
@@ -152,8 +152,8 @@ export default function RegisterPage() {
           >
             <ShieldCheck size={40} className="text-white" />
           </motion.div>
-          <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Crea tu cuenta</h1>
-          <p className="text-gray-500 font-medium">Organiza tus finanzas en un solo lugar.</p>
+          <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Nueva Identidad</h1>
+          <p className="text-gray-500 font-medium">Únete a la élite financiera de Cápi.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6" noValidate>
@@ -307,7 +307,6 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setMostrarPassword(!mostrarPassword)}
-                aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-600 hover:text-white transition-colors"
               >
                 {mostrarPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -357,7 +356,6 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setMostrarConfirmarPassword(!mostrarConfirmarPassword)}
-                aria-label={mostrarConfirmarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-600 hover:text-white transition-colors"
               >
                 {mostrarConfirmarPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -371,9 +369,9 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading || Object.keys(errores).length > 0}
-            className="w-full bg-gradient-to-r from-[#22c55e] to-[#16a34a] hover:shadow-[0_8px_24px_-8px_rgba(34,197,94,0.5)] text-[#090d16] py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="w-full bg-gradient-to-r from-[#22c55e] to-[#16a34a] hover:shadow-[0_8px_24px_-8px_rgba(34,197,94,0.5)] text-white py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
           >
-            {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
+            {isLoading ? 'Creando Acceso...' : 'Sellar Mi Registro'}
             {!isLoading && (
               <Sparkles size={20} className="group-hover:rotate-12 transition-transform" />
             )}

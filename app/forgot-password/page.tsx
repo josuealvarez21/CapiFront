@@ -11,25 +11,23 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isSent, setIsSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState('');
   const [honeypot, setHoneypot] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
 
     try {
       await api.auth.forgotPassword(email, { honeypot, turnstileToken });
       trackEvent('password_reset_requested', {});
       setIsSent(true);
-    } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message || 'No se pudo procesar la solicitud. Inténtalo de nuevo.'
-          : 'No pudimos conectar. Revisa tu conexión e inténtalo de nuevo.'
-      );
+    } catch (error) {
+      if (error instanceof ApiError) {
+        alert(error.message || 'No se pudo procesar la solicitud');
+      } else {
+        alert('Error de conexión');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +51,7 @@ export default function ForgotPasswordPage() {
             href="/login"
             className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-8 text-sm font-bold uppercase tracking-widest"
           >
-            <ArrowLeft size={16} /> Volver al login
+            <ArrowLeft size={16} /> Volver al Inicio
           </Link>
 
           <div className="w-20 h-20 bg-gradient-to-br from-[#3b82f6] to-[#22c55e] rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-2xl shadow-blue-500/20">
@@ -92,11 +90,6 @@ export default function ForgotPasswordPage() {
               onChange={(e) => setHoneypot(e.target.value)}
             />
             <TurnstileField onToken={setTurnstileToken} />
-            {error && (
-              <p role="alert" className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-center text-xs font-medium text-red-300">
-                {error}
-              </p>
-            )}
             <div className="space-y-2">
               <label className="text-[11px] font-black text-gray-500 uppercase tracking-[2px] ml-1">
                 Tu Correo Registrado

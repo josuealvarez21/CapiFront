@@ -283,7 +283,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading || Object.keys(errores).length > 0}
-              className="group relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-[#3b82f6] to-[#22c55e] py-4 text-base font-black text-[#090d16] shadow-[0_14px_34px_-12px_rgba(59,130,246,0.9)] transition-all duration-300 hover:shadow-[0_18px_40px_-12px_rgba(34,197,94,0.85)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="group relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-[#3b82f6] to-[#22c55e] py-4 text-base font-black text-white shadow-[0_14px_34px_-12px_rgba(59,130,246,0.9)] transition-all duration-300 hover:shadow-[0_18px_40px_-12px_rgba(34,197,94,0.85)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="pointer-events-none absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-all duration-700 group-hover:left-full" />
               <span className="relative flex items-center justify-center gap-3">
@@ -308,11 +308,7 @@ export default function LoginPage() {
             </div>
 
             {hasGoogleId ? (
-              <Suspense
-                fallback={
-                  <div className="glass-soft h-[58px] w-full animate-pulse rounded-2xl" aria-hidden />
-                }
-              >
+              <Suspense fallback={null}>
                 <GoogleLoginButton setIsLoading={setIsLoading} />
               </Suspense>
             ) : (
@@ -320,7 +316,7 @@ export default function LoginPage() {
                 type="button"
                 disabled
                 className="glass-soft flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-2xl py-4 text-base font-black text-gray-500"
-                title="Google no disponible"
+                title="Configurar Google Client ID en .env.local"
               >
                 <Globe size={22} /> Google
               </button>
