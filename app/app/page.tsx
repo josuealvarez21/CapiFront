@@ -87,6 +87,8 @@ export default function SinglePageApp() {
     setSavingsDistributionMode,
     manualSavingsAmount,
     setManualSavingsAmount,
+    selectedGoalIds,
+    setSelectedGoalIds,
     showSuccessFeedback,
     showFeedback,
     fetchData,
@@ -334,6 +336,8 @@ export default function SinglePageApp() {
               setSavingsPercentage={setSavingsPercentage}
               savingsDistributionMode={savingsDistributionMode}
               setSavingsDistributionMode={setSavingsDistributionMode}
+              selectedGoalIds={selectedGoalIds}
+              setSelectedGoalIds={setSelectedGoalIds}
               manualSavingsAmount={manualSavingsAmount}
               setManualSavingsAmount={setManualSavingsAmount}
               showSuccessFeedback={showSuccessFeedback}
@@ -355,6 +359,7 @@ export default function SinglePageApp() {
                     data.metas,
                     totalToDistribute,
                     savingsDistributionMode,
+                    selectedGoalIds,
                   );
                   return (
                     <motion.div

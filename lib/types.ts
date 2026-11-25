@@ -118,7 +118,7 @@ export interface ReporteMensual {
 
 export type TabType = 'dashboard' | 'ingresos' | 'gastos' | 'metas' | 'presupuestos' | 'reporte';
 export type ModalMovementType = 'ambos' | 'ingreso' | 'gasto';
-export type SavingsDistributionMode = 'equitativa' | 'prioridad';
+export type SavingsDistributionMode = 'equitativa' | 'prioridad' | 'especifica';
 
 // --- Admin Types ---
 export interface AdminStats {
