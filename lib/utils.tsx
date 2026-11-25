@@ -16,13 +16,11 @@ export const formatCurrency = (amount: number | string): string => {
  * Strips non-digits and formats as COP with no decimals.
  */
 export const formatAmountForDisplay = (value: string): string => {
-  if (!value) return '';
-  const number = value.replace(/\D/g, '');
+  const digits = value.replace(/\D/g, '');
+  if (!digits) return '';
   return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    minimumFractionDigits: 0,
-  }).format(Number(number));
+    maximumFractionDigits: 0,
+  }).format(Number(digits));
 };
 
 /**
