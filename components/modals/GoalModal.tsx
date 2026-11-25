@@ -1,6 +1,7 @@
 'use client';
 
 import Modal from './Modal';
+import CurrencyInput from './CurrencyInput';
 
 interface GoalModalProps {
   isOpen: boolean;
@@ -39,14 +40,11 @@ export default function GoalModal({
           <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">
             Monto a Reunir ($)
           </label>
-          <input
-            type="number"
-            step="0.01"
-            required
+          <CurrencyInput
             value={formData.objetivo}
-            onChange={(e) => setFormData({ ...formData, objetivo: e.target.value })}
+            onChange={(objetivo) => setFormData({ ...formData, objetivo })}
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[20px] font-bold text-white focus:outline-none focus:border-[#3b82f6]"
-            placeholder="5000.00"
+            required
           />
         </div>
         <div>

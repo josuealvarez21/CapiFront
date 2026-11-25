@@ -8,19 +8,40 @@ export const formatCurrency = (amount: number | string): string => {
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(Number(amount));
 };
 
-/**
- * Format raw numeric string for display in currency inputs.
- * Strips non-digits and formats as COP with no decimals.
- */
-export const formatAmountForDisplay = (value: string): string => {
+export const normalizeAmountInput = (value: string): string => {
   const digits = value.replace(/\D/g, '');
-  if (!digits) return '';
+  if (!digits) return '0';
+  return String(Number(digits));
+};
+
+export const formatAmountForInput = (value: string): string => {
   return new Intl.NumberFormat('es-CO', {
     maximumFractionDigits: 0,
-  }).format(Number(digits));
+  }).format(Number(normalizeAmountInput(value)));
+};
+
+export const formatAmountForDisplay = (value: string): string => formatAmountForInput(value);
+
+export const parseAmountForBackend = (value: string): number => {
+  return Number(normalizeAmountInput(value));
+};
+
+export const getAmountCaretPosition = (value: string): number => {
+  const formatted = formatAmountForInput(value);
+  const digitCount = normalizeAmountInput(value).replace(/\D/g, '').length;
+  let seenDigits = 0;
+
+  for (let index = 0; index < formatted.length; index += 1) {
+    if (/\d/.test(formatted[index])) seenDigits += 1;
+    if (seenDigits >= digitCount) return index + 1;
+  }
+
+  return formatted.length;
 };
 
 /**

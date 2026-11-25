@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { api, UnauthorizedError } from '@/lib/api';
-import { getTodayISO, getCurrentMonthISO } from '@/lib/utils';
+import { getTodayISO, getCurrentMonthISO, parseAmountForBackend } from '@/lib/utils';
 import type {
   DashboardData,
   TabType,
@@ -41,7 +41,7 @@ export function useDashboard() {
 
   // Movement form
   const [formData, setFormData] = useState({
-    monto: '',
+    monto: '0',
     descripcion: '',
     id_categoria: '',
     fecha: getTodayISO(),
@@ -50,14 +50,14 @@ export function useDashboard() {
   // Goal form
   const [goalFormData, setGoalFormData] = useState({
     nombre: '',
-    objetivo: '',
+    objetivo: '0',
     fecha: getTodayISO(),
   });
 
   // Budget form
   const [budgetFormData, setBudgetFormData] = useState({
     id_categoria: '',
-    limite: '',
+    limite: '0',
     fecha_mes: getCurrentMonthISO(),
   });
 
@@ -66,6 +66,7 @@ export function useDashboard() {
   const [savingsDistributionMode, setSavingsDistributionMode] =
     useState<SavingsDistributionMode>('equitativa');
   const [manualSavingsAmount, setManualSavingsAmount] = useState('');
+  const [selectedGoalIds, setSelectedGoalIds] = useState<string[]>([]);
   const [showSuccessFeedback, setShowSuccessFeedback] = useState<string | null>(null);
 
   // --- Auth redirect ---
@@ -381,44 +382,59 @@ export function useDashboard() {
   const handleAddMovement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
+    const monto = parseAmountForBackend(formData.monto);
+    if (monto <= 0) {
+      showFeedback('El monto debe ser mayor que 0.');
+      return;
+    }
     setIsSubmitting(true);
     createMovementMutation.mutate({
       id_categoria: parseInt(formData.id_categoria),
-      monto: parseFloat(formData.monto),
+      monto,
       descripcion: formData.descripcion,
       fecha: formData.fecha,
     });
     setIsModalOpen(false);
-    setFormData({ monto: '', descripcion: '', id_categoria: '', fecha: getTodayISO() });
+    setFormData({ monto: '0', descripcion: '', id_categoria: '', fecha: getTodayISO() });
   };
 
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
+    const montoObjetivo = parseAmountForBackend(goalFormData.objetivo);
+    if (montoObjetivo <= 0) {
+      showFeedback('El objetivo debe ser mayor que 0.');
+      return;
+    }
     setIsSubmitting(true);
     createGoalMutation.mutate({
       nombre_meta: goalFormData.nombre,
-      monto_objetivo: parseFloat(goalFormData.objetivo),
+      monto_objetivo: montoObjetivo,
       monto_actual: 0,
       fecha_limite: goalFormData.fecha,
     });
     setIsGoalModalOpen(false);
-    setGoalFormData({ nombre: '', objetivo: '', fecha: getTodayISO() });
+    setGoalFormData({ nombre: '', objetivo: '0', fecha: getTodayISO() });
   };
 
   const handleAddBudget = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
+    const montoLimite = parseAmountForBackend(budgetFormData.limite);
+    if (montoLimite <= 0) {
+      showFeedback('El límite debe ser mayor que 0.');
+      return;
+    }
     setIsSubmitting(true);
     const dateParts = budgetFormData.fecha_mes.split('-');
     createBudgetMutation.mutate({
       id_categoria: parseInt(budgetFormData.id_categoria),
-      monto_limite: parseFloat(budgetFormData.limite),
+      monto_limite: montoLimite,
       mes: parseInt(dateParts[1]),
       anio: parseInt(dateParts[0]),
     });
     setIsBudgetModalOpen(false);
-    setBudgetFormData({ id_categoria: '', limite: '', fecha_mes: getCurrentMonthISO() });
+    setBudgetFormData({ id_categoria: '', limite: '0', fecha_mes: getCurrentMonthISO() });
   };
 
   const profileName = profileNameDraft ?? dashboardData?.user?.nombre ?? '';
@@ -516,6 +532,8 @@ export function useDashboard() {
     setSavingsDistributionMode,
     manualSavingsAmount,
     setManualSavingsAmount,
+    selectedGoalIds,
+    setSelectedGoalIds,
     showSuccessFeedback,
     showFeedback,
     // Refresh (manual refetch)
