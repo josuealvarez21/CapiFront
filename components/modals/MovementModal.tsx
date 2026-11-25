@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import Modal from './Modal';
 import { formatAmountForDisplay } from '@/lib/utils';
 import type { CategoriaBackend, ModalMovementType } from '@/lib/types';
@@ -32,6 +33,9 @@ export default function MovementModal({
   currentTab,
   isSubmitting,
 }: MovementModalProps) {
+  const [isAmountFocused, setIsAmountFocused] = useState(false);
+  const amountInputRef = useRef<HTMLInputElement>(null);
+
   const categoriesFiltered =
     modalType === 'ingreso' || currentTab === 'ingresos'
       ? categories.filter((c) => c.tipo === 'ingreso')
@@ -71,9 +75,19 @@ export default function MovementModal({
               <span className="text-xl font-bold">$</span>
             </div>
             <input
+              ref={amountInputRef}
               type="text"
+              inputMode="numeric"
               placeholder="0,00"
-              value={formatAmountForDisplay(formData.monto)}
+              value={isAmountFocused ? formData.monto : formatAmountForDisplay(formData.monto)}
+              onFocus={() => {
+                setIsAmountFocused(true);
+                requestAnimationFrame(() => {
+                  const input = amountInputRef.current;
+                  input?.setSelectionRange(input.value.length, input.value.length);
+                });
+              }}
+              onBlur={() => setIsAmountFocused(false)}
               onChange={(e) =>
                 setFormData({ ...formData, monto: e.target.value.replace(/\D/g, '') })
               }

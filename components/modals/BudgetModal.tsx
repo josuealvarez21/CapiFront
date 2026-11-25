@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import Modal from './Modal';
 import { formatAmountForDisplay } from '@/lib/utils';
 import type { CategoriaBackend } from '@/lib/types';
@@ -23,6 +24,9 @@ export default function BudgetModal({
   categories,
   isSubmitting,
 }: BudgetModalProps) {
+  const [isAmountFocused, setIsAmountFocused] = useState(false);
+  const amountInputRef = useRef<HTMLInputElement>(null);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Escudo Financiero">
       <form onSubmit={onSubmit} className="space-y-5">
@@ -57,9 +61,19 @@ export default function BudgetModal({
               <span className="text-xl font-bold">$</span>
             </div>
             <input
+              ref={amountInputRef}
               type="text"
+              inputMode="numeric"
               placeholder="0,00"
-              value={formatAmountForDisplay(formData.limite)}
+              value={isAmountFocused ? formData.limite : formatAmountForDisplay(formData.limite)}
+              onFocus={() => {
+                setIsAmountFocused(true);
+                requestAnimationFrame(() => {
+                  const input = amountInputRef.current;
+                  input?.setSelectionRange(input.value.length, input.value.length);
+                });
+              }}
+              onBlur={() => setIsAmountFocused(false)}
               onChange={(e) =>
                 setFormData({ ...formData, limite: e.target.value.replace(/\D/g, '') })
               }
