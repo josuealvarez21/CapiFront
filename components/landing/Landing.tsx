@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import LandingNav from '@/components/landing/LandingNav';
+import LandingQuickLinks from '@/components/landing/LandingQuickLinks';
 import Hero from '@/components/landing/Hero';
 import FeatureBento from '@/components/landing/FeatureBento';
 import HowItWorks from '@/components/landing/HowItWorks';
@@ -31,6 +32,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-[#090d16] font-sans text-white">
       <LandingNav />
+      <LandingQuickLinks />
       <main className="pb-20 md:pb-0">
         <Hero reduceMotion={reduceMotion} />
         <FeatureBento reduceMotion={reduceMotion} />
