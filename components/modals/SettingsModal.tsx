@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import Modal from './Modal';
 import Image from 'next/image';
 import { resolvePhotoUrl } from '@/lib/api';
@@ -32,11 +33,22 @@ export default function SettingsModal({
   setProfilePicFile,
   isUploading,
 }: SettingsModalProps) {
-  const previewSrc =
-    profilePicUrl ||
-    (profilePicFile ? URL.createObjectURL(profilePicFile) : null) ||
-    resolvePhotoUrl(user.foto_perfil) ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=121212&color=fff`;
+  const [failedPreview, setFailedPreview] = useState<string | null>(null);
+  const objectUrl = useMemo(
+    () => (profilePicFile ? URL.createObjectURL(profilePicFile) : null),
+    [profilePicFile],
+  );
+  const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=121212&color=fff`;
+
+  useEffect(() => {
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [objectUrl]);
+
+  const candidateSrc =
+    profilePicUrl || objectUrl || resolvePhotoUrl(user.foto_perfil) || fallbackUrl;
+  const previewSrc = failedPreview === candidateSrc ? fallbackUrl : candidateSrc;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Ajustes de Perfil">
@@ -49,6 +61,7 @@ export default function SettingsModal({
               width={96}
               height={96}
               unoptimized
+              onError={() => setFailedPreview(candidateSrc)}
               className="w-full h-full rounded-full object-cover border-4 border-[#0a0e17]"
             />
           </div>
@@ -99,10 +112,14 @@ export default function SettingsModal({
             type="file"
             accept="image/*"
             onChange={(e) => {
-              if (e.target.files?.[0]) {
-                setProfilePicFile(e.target.files[0]);
-                setProfilePicUrl('');
+              const file = e.target.files?.[0];
+              if (!file) return;
+              if (!file.type.startsWith('image/')) {
+                e.target.value = '';
+                return;
               }
+              setProfilePicFile(file);
+              setProfilePicUrl('');
             }}
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#3b82f6] file:text-white hover:file:bg-blue-600 cursor-pointer"
           />

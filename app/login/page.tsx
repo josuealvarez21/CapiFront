@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
 import { api, ApiError } from '@/lib/api';
 import { trackEvent } from '@/lib/analytics';
+import { validatePasswordForLogin } from '@/lib/validation';
 import TurnstileField from '@/components/security/TurnstileField';
 
 const GoogleLoginButton = lazy(() => import('@/components/GoogleLoginButton'));
@@ -42,15 +43,8 @@ export default function LoginPage() {
     return undefined;
   };
 
-  const validarCampoPassword = (valor: string): string | undefined => {
-    if (!valor) return 'La contraseña es obligatoria';
-    if (/[<>'"\\`]/.test(valor))
-      return 'La contraseña contiene caracteres no permitidos (< > \' " \\ `)';
-    if (valor !== valor.trim()) return 'La contraseña no puede tener espacios al inicio ni al final';
-    if (valor.length < 8 || !/[A-Z]/.test(valor) || !/[a-z]/.test(valor) || !/[^a-zA-Z0-9]/.test(valor))
-      return 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un símbolo (ej. . , @ _)';
-    return undefined;
-  };
+  const validarCampoPassword = (valor: string): string | undefined =>
+    validatePasswordForLogin(valor);
 
   const validarFormulario = (): boolean => {
     const nuevos: typeof errores = {};
@@ -75,7 +69,7 @@ export default function LoginPage() {
     setErrores({});
 
     try {
-      const data = await api.auth.login(email.trim(), password.trim(), {
+      const data = await api.auth.login(email.trim(), password, {
         honeypot,
         turnstileToken,
       });
@@ -240,6 +234,7 @@ export default function LoginPage() {
                 </div>
                 <input
                   type={mostrarPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => {

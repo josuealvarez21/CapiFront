@@ -10,7 +10,7 @@ import type {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-/** Las fotos nuevas son rutas relativas servidas por un endpoint autenticado. */
+/** Las fotos nuevas se sirven desde la BD mediante un token opaco. */
 export function resolvePhotoUrl(value?: string | null): string {
   if (!value) return '';
   if (/^https?:\/\//i.test(value)) {

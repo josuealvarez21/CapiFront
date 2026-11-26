@@ -8,6 +8,7 @@ interface AuthUser {
   nombre: string;
   email: string;
   rol: string;
+  foto_perfil?: string | null;
 }
 
 interface AuthContextType {
@@ -18,7 +19,7 @@ interface AuthContextType {
   logout: () => void;
   clearSession: () => void;
   loading: boolean;
-  setUser: (user: AuthUser | null) => void;
+  setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
 }
 
 function decodeTokenPayload(token: string): Record<string, unknown> | null {

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
 import { trackEvent } from '@/lib/analytics';
+import { PASSWORD_MIN_LENGTH, validatePassword } from '@/lib/validation';
 
 function ResetPasswordForm() {
   const params = useSearchParams();
@@ -15,8 +16,14 @@ function ResetPasswordForm() {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const passwordError = validatePassword(password);
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -43,16 +50,23 @@ function ResetPasswordForm() {
             {error && <p className="text-sm text-red-400">{error}</p>}
             <input
               type="password"
-              minLength={8}
+              minLength={PASSWORD_MIN_LENGTH}
               required
+              autoComplete="new-password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => {
+                setPassword(event.target.value);
+                setError(null);
+              }}
               placeholder="Nueva contraseña"
               className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm outline-none focus:border-[#22c55e]"
             />
+            {passwordError && password.length > 0 && (
+              <p className="-mt-2 text-xs text-red-400">{passwordError}</p>
+            )}
             <button
               type="submit"
-              disabled={loading || !token}
+              disabled={loading || !token || !!passwordError}
               className="w-full rounded-2xl bg-[#22c55e] px-4 py-3 text-sm font-black text-[#090d16] disabled:opacity-50"
             >
               {loading ? 'Guardando…' : 'Guardar contraseña'}
