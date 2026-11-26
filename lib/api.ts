@@ -7,8 +7,9 @@ import type {
   AdminUserUpdate,
   ChatModo,
 } from './types';
+import { API_URL } from './public-urls';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE = API_URL;
 
 /** Las fotos nuevas se sirven desde la BD mediante un token opaco. */
 export function resolvePhotoUrl(value?: string | null): string {
