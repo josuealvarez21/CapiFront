@@ -129,6 +129,28 @@ export interface ReporteMensualCrudo {
   }[];
 }
 
+export interface EvolucionAhorroCrudo {
+  meses: {
+    mes: number;
+    anio: number;
+    etiqueta: string;
+    ingresos: DecimalStr;
+    gastos: DecimalStr;
+    balance: DecimalStr;
+    tasa_ahorro: DecimalStr;
+  }[];
+  promedio_ahorro: DecimalStr;
+  tendencia_balance_pct: number | null;
+}
+
+export interface AporteMetaCrudo {
+  id_meta: number;
+  monto: DecimalStr;
+  fecha_hora: string;
+  origen: string;
+  descripcion: string;
+}
+
 export interface MovimientosListParams {
   skip?: number;
   limit?: number;
@@ -300,6 +322,18 @@ export const api = {
         body: JSON.stringify(data),
       }),
 
+    update: (
+      token: string,
+      id: string,
+      data: { id_categoria: number; monto: number; descripcion: string; fecha: string },
+    ) =>
+      apiRequest<Transaccion>(`/api/v1/movements/${id}`, {
+        method: 'PUT',
+        token,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+
     list: async (token: string, params: MovimientosListParams = {}): Promise<MovimientosPage> => {
       const response = await fetch(
         `${API_BASE}/api/v1/movements/${buildMovementsQuery(params)}`,
@@ -387,6 +421,14 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(allocations),
       }),
+
+    listContributions: (token: string, id: string, skip = 0, limit = 100) =>
+      apiRequest<{
+        items: AporteMetaCrudo[];
+        total: number;
+        skip: number;
+        limit: number;
+      }>(`/api/v1/goals/${id}/contributions?skip=${skip}&limit=${limit}`, { token }),
   },
 
   // --- Budgets ---
@@ -446,6 +488,9 @@ export const api = {
         { token },
       );
     },
+
+    evolucionAhorro: (token: string) =>
+      apiRequest<EvolucionAhorroCrudo>('/api/v1/reportes/evolucion-ahorro', { token }),
   },
 
   // --- Users ---

@@ -549,6 +549,7 @@ export function useDashboard() {
     selectedGoalIds,
     setSelectedGoalIds,
     showSuccessFeedback,
+    setShowSuccessFeedback,
     showFeedback,
     // Refresh (manual refetch)
     fetchData: refetchDashboard,

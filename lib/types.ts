@@ -126,6 +126,30 @@ export interface ReporteMensual {
   movimientos: ReporteMovimiento[];
 }
 
+export interface EvolucionMes {
+  mes: number;
+  anio: number;
+  etiqueta: string;
+  ingresos: number;
+  gastos: number;
+  balance: number;
+  tasa_ahorro: number;
+}
+
+export interface EvolucionAhorro {
+  meses: EvolucionMes[];
+  promedio_ahorro: number;
+  tendencia_balance_pct: number | null;
+}
+
+export interface AporteMeta {
+  id_meta: number;
+  monto: number;
+  fecha_hora: string;
+  origen: string;
+  descripcion: string;
+}
+
 export type TabType = 'dashboard' | 'ingresos' | 'gastos' | 'metas' | 'presupuestos' | 'reporte';
 export type ModalMovementType = 'ambos' | 'ingreso' | 'gasto';
 export type SavingsDistributionMode = 'equitativa' | 'prioridad' | 'especifica';

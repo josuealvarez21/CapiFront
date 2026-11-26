@@ -7,10 +7,12 @@ import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import { MESES_ES } from '@/lib/utils';
 import { useReporteMensual } from '@/hooks/useReporteMensual';
+import { useEvolucionAhorro } from '@/hooks/useEvolucionAhorro';
 import MovementsList from '@/components/MovementsList';
 import { ResumenMes } from './ResumenMes';
 import { TablaComparativa } from './TablaComparativa';
 import { ComparativaMesAnterior } from './ComparativaMesAnterior';
+import EvolucionAhorroChart from './EvolucionAhorroChart';
 import ConfirmDialog, { type ConfirmOptions } from '@/components/modals/ConfirmDialog';
 
 const selectClass =
@@ -33,6 +35,7 @@ export function ReporteMensualTab({ onDeleted }: { onDeleted: () => void }) {
     aniosDisponibles,
     refetch,
   } = useReporteMensual();
+  const evolucion = useEvolucionAhorro();
 
   const aniosSelector = aniosDisponibles.length
     ? aniosDisponibles
@@ -163,6 +166,13 @@ export function ReporteMensualTab({ onDeleted }: { onDeleted: () => void }) {
         {data && (
           <div className={loading ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
             <ResumenMes resumen={data.resumen} periodo={data.periodo} />
+
+            <EvolucionAhorroChart
+              data={evolucion.data}
+              loading={evolucion.loading}
+              error={evolucion.error}
+              onRetry={() => void evolucion.refetch()}
+            />
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               {/* Movimientos del mes */}

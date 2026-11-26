@@ -1,8 +1,7 @@
 module.exports = {
   ci: {
     collect: {
-      url: ['http://localhost:3000/'],
-      startServerCommand: 'npm run start',
+      url: ['https://capi-front-ten.vercel.app/'],
       numberOfRuns: 1,
     },
     assert: {

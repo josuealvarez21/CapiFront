@@ -1,13 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { formatCurrency, getCategoryIcon, getCategoryBadgeClass } from '@/lib/utils';
 import type { Transaccion } from '@/lib/types';
 
 interface MovementsListProps {
   movements: Transaccion[];
   onDelete: (id: string) => void;
+  onEdit?: (movement: Transaccion) => void;
   emptyIcon?: React.ReactNode;
   emptyMessage?: string;
   variant?: 'compact' | 'full';
@@ -16,6 +17,7 @@ interface MovementsListProps {
 export default function MovementsList({
   movements,
   onDelete,
+  onEdit,
   emptyIcon,
   emptyMessage = 'No hay movimientos. Agrega uno.',
   variant = 'compact',
@@ -74,6 +76,16 @@ export default function MovementsList({
               {mov.tipo === 'ingreso' ? '+' : '-'}
               {formatCurrency(mov.monto)}
             </span>
+            {onEdit && (
+              <button
+                type="button"
+                onClick={() => onEdit(mov)}
+                aria-label={`Editar movimiento ${mov.descripcion}`}
+                className="-mr-1 shrink-0 rounded-lg p-1 text-gray-500 transition-colors hover:bg-[#3b82f6]/10 hover:text-[#60a5fa] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3b82f6] sm:p-1.5 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+              >
+                <Pencil size={isCompact ? 16 : 18} className="sm:h-[22px] sm:w-[22px]" />
+              </button>
+            )}
             <button
               type="button"
               onClick={() => onDelete(mov.id)}
