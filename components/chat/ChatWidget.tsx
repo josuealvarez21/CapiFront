@@ -1,7 +1,9 @@
 'use client';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { MessageCircle, X } from 'lucide-react';
 import { useChat } from '@/hooks/useChat';
+import ConfirmDialog, { type ConfirmOptions } from '@/components/modals/ConfirmDialog';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { ConfirmationCard } from './ConfirmationCard';
@@ -22,6 +24,9 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
     clearHistory,
     stopStreaming,
   } = useChat(onDataChange);
+
+  const reduceMotion = useReducedMotion() ?? false;
+  const [pendingClearConfirm, setPendingClearConfirm] = useState<ConfirmOptions | null>(null);
 
   return (
     <>
@@ -48,7 +53,15 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
               <div className="flex items-center gap-1">
                 {messages.length > 0 && (
                   <button
-                    onClick={clearHistory}
+                    onClick={() =>
+                      setPendingClearConfirm({
+                        title: 'Limpiar conversación',
+                        description: '¿Borrar todo el historial de CapiBot? Esta acción no se puede deshacer.',
+                        confirmLabel: 'Limpiar',
+                        tone: 'danger',
+                        onConfirm: clearHistory,
+                      })
+                    }
                     className="rounded-lg px-2 py-1 text-xs text-gray-500 transition-colors hover:bg-white/5 hover:text-gray-300"
                   >
                     Limpiar
@@ -126,6 +139,11 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
       </motion.button>
+      <ConfirmDialog
+        options={pendingClearConfirm}
+        onClose={() => setPendingClearConfirm(null)}
+        reduceMotion={reduceMotion}
+      />
     </>
   );
 }

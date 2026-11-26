@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { CalendarDays, RefreshCw, TrendingDown, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
@@ -11,13 +11,17 @@ import MovementsList from '@/components/MovementsList';
 import { ResumenMes } from './ResumenMes';
 import { TablaComparativa } from './TablaComparativa';
 import { ComparativaMesAnterior } from './ComparativaMesAnterior';
+import ConfirmDialog, { type ConfirmOptions } from '@/components/modals/ConfirmDialog';
 
 const selectClass =
   'glass-soft bg-[#0a0e17] text-xs font-bold text-white border border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:border-[#3b82f6] [color-scheme:dark] cursor-pointer';
 
 export function ReporteMensualTab({ onDeleted }: { onDeleted: () => void }) {
   const { token } = useAuth();
+  const reduceMotion = useReducedMotion() ?? false;
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmOptions | null>(null);
   const {
     data,
     loading,
@@ -37,19 +41,27 @@ export function ReporteMensualTab({ onDeleted }: { onDeleted: () => void }) {
   const etiquetaPeriodo = data ? data.periodo.etiqueta : `${MESES_ES[mes - 1]} ${anio}`;
 
   const handleDelete = useCallback(
-    async (id: string) => {
+    (id: string) => {
       if (!token) return;
-      if (!confirm('¿Estás seguro de eliminar este movimiento?')) return;
-      setDeletingId(id);
-      try {
-        await api.movements.delete(token, id);
-        await refetch();
-        onDeleted();
-      } catch {
-        alert('No se pudo eliminar el movimiento.');
-      } finally {
-        setDeletingId(null);
-      }
+      setDeleteError(null);
+      setPendingConfirm({
+        title: 'Eliminar movimiento',
+        description: '¿Eliminar este movimiento? Esta acción no se puede deshacer.',
+        confirmLabel: 'Eliminar',
+        tone: 'danger',
+        onConfirm: async () => {
+          setDeletingId(id);
+          try {
+            await api.movements.delete(token, id);
+            await refetch();
+            onDeleted();
+          } catch {
+            setDeleteError('No se pudo eliminar el movimiento.');
+          } finally {
+            setDeletingId(null);
+          }
+        },
+      });
     },
     [token, refetch, onDeleted],
   );
@@ -185,6 +197,11 @@ export function ReporteMensualTab({ onDeleted }: { onDeleted: () => void }) {
                 {deletingId && (
                   <p className="text-center text-xs text-gray-500 mt-3">Eliminando…</p>
                 )}
+                {deleteError && (
+                  <p role="alert" className="text-center text-xs text-red-400 mt-3">
+                    {deleteError}
+                  </p>
+                )}
               </section>
 
               <ComparativaMesAnterior resumen={data.resumen} periodo={data.periodo} />
@@ -199,6 +216,11 @@ export function ReporteMensualTab({ onDeleted }: { onDeleted: () => void }) {
           </div>
         )}
       </motion.div>
+      <ConfirmDialog
+        options={pendingConfirm}
+        onClose={() => setPendingConfirm(null)}
+        reduceMotion={reduceMotion}
+      />
     </div>
   );
 }

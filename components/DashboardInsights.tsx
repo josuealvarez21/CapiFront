@@ -62,7 +62,14 @@ function InsightCard({ label, value, detail, icon: Icon, tone, reduceMotion }: I
 export default function DashboardInsights({ data, reduceMotion }: DashboardInsightsProps) {
   const ingresos = Number(data.summary.ingresos_mes) || 0;
   const gastos = Number(data.summary.gastos_mes) || 0;
-  const tasaAhorro = ingresos > 0 ? ((ingresos - gastos) / ingresos) * 100 : 0;
+  const tasaAhorroBackend = data.summary.tasa_ahorro;
+  const tasaAhorroCalculada =
+    tasaAhorroBackend === undefined || tasaAhorroBackend === null
+      ? ingresos > 0
+        ? ((ingresos - gastos) / ingresos) * 100
+        : Number.NaN
+      : Number(tasaAhorroBackend);
+  const hayTasaAhorro = Number.isFinite(tasaAhorroCalculada) && ingresos > 0;
 
   const presupuesto = [...data.presupuestos]
     .filter((p) => Number(p.limite) > 0)
@@ -101,10 +108,10 @@ export default function DashboardInsights({ data, reduceMotion }: DashboardInsig
     >
       <InsightCard
         label="Tasa de ahorro"
-        value={`${tasaAhorro.toFixed(1)}%`}
-        detail={ingresos > 0 ? 'De tus ingresos de este mes' : 'Sin ingresos registrados'}
+        value={hayTasaAhorro ? `${tasaAhorroCalculada.toFixed(1)}%` : '—'}
+        detail={hayTasaAhorro ? 'De tus ingresos de este mes' : 'Sin ingresos este mes'}
         icon={PiggyBank}
-        tone={tasaAhorro >= 0 ? 'green' : 'red'}
+        tone={!hayTasaAhorro ? 'blue' : tasaAhorroCalculada >= 0 ? 'green' : 'red'}
         reduceMotion={reduceMotion}
       />
 
