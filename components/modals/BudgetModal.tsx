@@ -81,7 +81,7 @@ export default function BudgetModal({
           disabled={isSubmitting}
           className="w-full bg-gradient-to-r from-[#3b82f6] to-[#22c55e] hover:from-[#2563eb] hover:to-[#16a34a] text-white py-4 rounded-xl font-extrabold text-lg mt-6 shadow-lg shadow-blue-900/30"
         >
-          {isSubmitting ? 'Blindando...' : 'Fijar Bóveda'}
+          {isSubmitting ? 'Guardando...' : 'Guardar presupuesto'}
         </button>
       </form>
     </Modal>

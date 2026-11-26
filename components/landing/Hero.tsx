@@ -73,7 +73,7 @@ export default function Hero({ reduceMotion }: HeroProps) {
               href="/login"
               className="group inline-flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-gradient-to-r from-[#3b82f6] to-[#2563eb] px-6 py-4 text-sm font-black text-white transition-all duration-300 hover:shadow-[0_8px_24px_-8px_rgba(59,130,246,0.5)] sm:w-auto"
             >
-              Entrar a la Bóveda
+              Iniciar sesión
               <ArrowRight
                 size={18}
                 aria-hidden="true"

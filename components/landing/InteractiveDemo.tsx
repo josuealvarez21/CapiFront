@@ -60,8 +60,11 @@ export default function InteractiveDemo({ reduceMotion }: InteractiveDemoProps) 
             Míralo en acción.
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-gray-400 sm:text-base">
-            Es una mini-app de verdad: aboná a una meta, cambiá de mes o pedile algo al bot. Todo
-            se actualiza junto.
+            Es una mini-app de verdad: abona a una meta, cambia de mes o pide algo al bot. Todo se
+            actualiza junto.
+          </p>
+          <p className="mt-3 inline-flex rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-[11px] font-bold text-amber-300">
+            Datos ficticios de demostración · no afectan tu cuenta
           </p>
         </motion.div>
 
