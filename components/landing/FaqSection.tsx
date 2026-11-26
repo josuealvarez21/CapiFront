@@ -7,7 +7,7 @@ interface FaqSectionProps {
 
 export default function FaqSection({ items, id = 'preguntas-frecuentes' }: FaqSectionProps) {
   return (
-    <section id={id} aria-labelledby={`${id}-titulo`} className="scroll-mt-24 px-4 py-16 sm:px-6 lg:px-8">
+    <section id={id} aria-labelledby={`${id}-titulo`} className="px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <h2 id={`${id}-titulo`} className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
           Preguntas frecuentes
