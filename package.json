@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "format": "prettier --write \"**/*.{ts,tsx,css,json}\""
+    "format": "prettier --write \"**/*.{ts,tsx,css,json}\"",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
@@ -22,6 +23,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.16.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

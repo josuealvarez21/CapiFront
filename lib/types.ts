@@ -11,6 +11,7 @@ export interface SummaryData {
   balance_total: number;
   ingresos_mes: number;
   gastos_mes: number;
+  tasa_ahorro?: number;
 }
 
 export interface CategoriaDistribucion {
@@ -28,6 +29,13 @@ export interface Transaccion {
   fecha: string;
 }
 
+export interface MovimientosPage {
+  items: Transaccion[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
 export interface Meta {
   id: string;
   nombre: string;
@@ -36,6 +44,7 @@ export interface Meta {
   fecha_limite?: string;
   ahorro_automatico?: boolean;
   color?: string;
+  progreso?: number;
 }
 
 export interface Presupuesto {
@@ -43,6 +52,7 @@ export interface Presupuesto {
   categoria: string;
   gastado: number;
   limite: number;
+  progreso?: number;
 }
 
 export interface DashboardData {

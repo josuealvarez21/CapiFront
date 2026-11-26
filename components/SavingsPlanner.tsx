@@ -43,10 +43,13 @@ export default function SavingsPlanner({
   onRequestConfirm,
 }: SavingsPlannerProps) {
   const manualAmount = parseAmountForBackend(manualSavingsAmount);
-  const totalToDistribute =
-    manualAmount > 0
-      ? manualAmount
-      : (Number(data.summary.balance_total) * savingsPercentage) / 100;
+  const balanceDisponible = Math.max(0, Number(data.summary.balance_total) || 0);
+  const ingresosDelMes = Math.max(0, Number(data.summary.ingresos_mes) || 0);
+  const baseMensual = Math.min(ingresosDelMes, balanceDisponible);
+  const totalToDistribute = Math.min(
+    balanceDisponible,
+    manualAmount > 0 ? manualAmount : (baseMensual * savingsPercentage) / 100,
+  );
 
   const activeMetas = data.metas.filter((m) => m.ahorro_actual < m.monto_objetivo);
   const selectedIds = selectedGoalIds.filter((id) => activeMetas.some((m) => m.id === id));
@@ -189,7 +192,7 @@ export default function SavingsPlanner({
             <div className="flex-1">
               <div className="flex justify-between mb-2">
                 <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">
-                  Porcentaje de Balance
+                  % de ingresos del mes
                 </span>
                 <span className="text-[#4ade80] font-extrabold">{savingsPercentage}%</span>
               </div>
@@ -228,7 +231,10 @@ export default function SavingsPlanner({
                 Balance Disponible
               </p>
               <p className="text-sm font-bold text-white sm:text-base">
-                {formatCurrency(data.summary.balance_total)}
+                {formatCurrency(balanceDisponible)}
+              </p>
+              <p className="mt-1 text-[10px] text-gray-500">
+                Base mensual: {formatCurrency(baseMensual)}
               </p>
             </div>
             <div className="glass-soft p-4 rounded-xl border border-[#22c55e]/40 bg-[#22c55e]/5">

@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   TrendingUp,
@@ -10,11 +12,13 @@ import {
   MinusCircle,
   Target,
   Wallet,
+  Download,
 } from 'lucide-react';
 import { useDashboard } from '@/hooks/useDashboard';
 import { formatCurrency } from '@/lib/utils';
 import { getProjectedForMeta } from '@/lib/savings';
 import { api } from '@/lib/api';
+import type { TabType } from '@/lib/types';
 import { tabSwap } from '@/lib/motion';
 
 import Sidebar from '@/components/Sidebar';
@@ -22,7 +26,9 @@ import BottomNav from '@/components/BottomNav';
 import DashboardHeader from '@/components/DashboardHeader';
 import DashboardInsights from '@/components/DashboardInsights';
 import SummaryCards from '@/components/SummaryCards';
-import IncomeExpenseChart from '@/components/charts/IncomeExpenseChart';
+const IncomeExpenseChart = dynamic(() => import('@/components/charts/IncomeExpenseChart'), {
+  loading: () => <div className="min-h-[20rem]" aria-hidden="true" />,
+});
 import MovementsList from '@/components/MovementsList';
 import MetaProgress from '@/components/MetaProgress';
 import PresupuestoProgress from '@/components/PresupuestoProgress';
@@ -32,13 +38,20 @@ import GoalModal from '@/components/modals/GoalModal';
 import BudgetModal from '@/components/modals/BudgetModal';
 import SettingsModal from '@/components/modals/SettingsModal';
 import ConfirmDialog, { type ConfirmOptions } from '@/components/modals/ConfirmDialog';
-import { ReporteMensualTab } from '@/components/reporte/ReporteMensual';
+const ReporteMensualTab = dynamic(
+  () => import('@/components/reporte/ReporteMensual').then((mod) => mod.ReporteMensualTab),
+  { loading: () => <div className="min-h-[24rem]" aria-hidden="true" /> },
+);
 import { ChatWidget } from '@/components/chat/ChatWidget';
 
 export default function SinglePageApp() {
   const dashboard = useDashboard();
   const reduceMotion = useReducedMotion() ?? false;
   const [monthFilter, setMonthFilter] = useState('');
+  const [movementSearch, setMovementSearch] = useState('');
+  const [movementCategory, setMovementCategory] = useState('');
+  const [movementPage, setMovementPage] = useState(0);
+  const [budgetUpdateError, setBudgetUpdateError] = useState('');
   const [pendingConfirm, setPendingConfirm] = useState<ConfirmOptions | null>(null);
 
   const {
@@ -94,6 +107,148 @@ export default function SinglePageApp() {
     fetchData,
   } = dashboard;
 
+  const MOVEMENT_PAGE_SIZE = 20;
+
+  const parametrosMovimientos = useMemo(() => {
+    let fecha_desde: string | undefined;
+    let fecha_hasta: string | undefined;
+    if (monthFilter) {
+      const [anio, mes] = monthFilter.split('-').map(Number);
+      const ultimoDia = new Date(anio, mes, 0).getDate();
+      fecha_desde = `${anio}-${String(mes).padStart(2, '0')}-01`;
+      fecha_hasta = `${anio}-${String(mes).padStart(2, '0')}-${String(ultimoDia).padStart(2, '0')}`;
+    }
+    return {
+      skip: movementPage * MOVEMENT_PAGE_SIZE,
+      limit: MOVEMENT_PAGE_SIZE,
+      tipo: currentTab === 'ingresos' ? 'ingreso' : 'gasto',
+      busqueda: movementSearch.trim() || undefined,
+      id_categoria: movementCategory ? Number(movementCategory) : undefined,
+      fecha_desde,
+      fecha_hasta,
+    };
+  }, [currentTab, monthFilter, movementSearch, movementCategory, movementPage]);
+
+  const {
+    data: movimientosData,
+    isFetching: movimientosCargando,
+    error: movimientosError,
+    refetch: refetchMovimientos,
+  } = useQuery({
+    queryKey: [
+      'movimientos',
+      token,
+      currentTab,
+      monthFilter,
+      movementSearch,
+      movementCategory,
+      movementPage,
+    ],
+    queryFn: async () => {
+      if (!token) throw new Error('No token');
+      return api.movements.list(token, parametrosMovimientos);
+    },
+    enabled: !!token && (currentTab === 'ingresos' || currentTab === 'gastos'),
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    retry: 1,
+  });
+
+  const movementList = movimientosData?.items ?? [];
+  const movementTotal = movimientosData?.total ?? 0;
+  const movementListLoading = movimientosCargando;
+  const movementListError = movimientosError
+    ? 'No se pudo cargar el historial de movimientos.'
+    : '';
+
+  const cambiarTab = (tab: TabType) => {
+    setCurrentTab(tab);
+    setMovementPage(0);
+  };
+
+  const cambiarBusqueda = (valor: string) => {
+    setMovementSearch(valor);
+    setMovementPage(0);
+  };
+
+  const cambiarCategoria = (valor: string) => {
+    setMovementCategory(valor);
+    setMovementPage(0);
+  };
+
+  const cambiarMes = (valor: string) => {
+    setMonthFilter(valor);
+    setMovementPage(0);
+  };
+
+  const exportarMovimientos = async () => {
+    if (!token) return;
+    try {
+      await api.movements.exportCsv(token, {
+        ...parametrosMovimientos,
+        skip: undefined,
+        limit: undefined,
+      });
+    } catch {
+      showFeedback('No se pudo descargar el CSV.');
+    }
+  };
+
+  const handleUpdateBudget = async (id: string, limite: number) => {
+    if (!token) return;
+    setBudgetUpdateError('');
+    try {
+      await api.budgets.update(token, id, limite);
+      await fetchData();
+    } catch {
+      setBudgetUpdateError('No se pudo actualizar el límite del presupuesto.');
+    }
+  };
+
+  const requestDeleteMovement = (id: string) => {
+    const movement =
+      data?.ultimos_movimientos.find((item) => item.id === id) ??
+      movementList.find((item) => item.id === id);
+    setPendingConfirm({
+      title: 'Eliminar movimiento',
+      description: movement
+        ? `¿Eliminar "${movement.descripcion}"? Esta acción no se puede deshacer.`
+        : '¿Eliminar este movimiento? Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: async () => {
+        await handleDeleteMovement(id);
+        await refetchMovimientos();
+      },
+    });
+  };
+
+  const requestDeleteGoal = (id: string) => {
+    const goal = data?.metas.find((item) => item.id === id);
+    setPendingConfirm({
+      title: 'Eliminar meta',
+      description: goal
+        ? `¿Eliminar la meta "${goal.nombre}"? Esta acción no se puede deshacer.`
+        : '¿Eliminar esta meta? Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: () => handleDeleteGoal(id),
+    });
+  };
+
+  const requestDeleteBudget = (id: string) => {
+    const budget = data?.presupuestos.find((item) => item.id === id);
+    setPendingConfirm({
+      title: 'Eliminar presupuesto',
+      description: budget
+        ? `¿Eliminar el límite de "${budget.categoria}"? Esta acción no se puede deshacer.`
+        : '¿Eliminar este presupuesto? Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: () => handleDeleteBudget(id),
+    });
+  };
+
   // --- Loading / Auth states ---
   if (authLoading || !token) {
     return (
@@ -142,12 +297,6 @@ export default function SinglePageApp() {
   }
 
   // --- Derived data ---
-  const movementsFiltered = data.ultimos_movimientos
-    .filter((m) =>
-      currentTab === 'ingresos' ? m.tipo === 'ingreso' : m.tipo === 'egreso' || m.tipo === 'gasto',
-    )
-    .filter((m) => !monthFilter || m.fecha.startsWith(monthFilter));
-
   const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   const currentYear = new Date().getFullYear();
   const monthOptions = Array.from({ length: 12 }, (_, i) => ({
@@ -155,16 +304,17 @@ export default function SinglePageApp() {
     label: `${monthNames[i]} ${currentYear}`,
   }));
 
+  const baseMensual = Math.min(Number(data.summary.ingresos_mes), Number(data.summary.balance_total));
   const totalToDistribute = manualSavingsAmount
     ? Number(manualSavingsAmount)
-    : (Number(data.summary.balance_total) * savingsPercentage) / 100;
+    : (baseMensual * savingsPercentage) / 100;
 
   return (
     <div className="min-h-screen bg-[#090d16] text-white flex font-sans">
       <Sidebar
         user={data.user}
         currentTab={currentTab}
-        onTabChange={setCurrentTab}
+        onTabChange={cambiarTab}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
         onLogout={logout}
       />
@@ -241,7 +391,7 @@ export default function SinglePageApp() {
                   movements={data.ultimos_movimientos
                     .filter((m) => !monthFilter || m.fecha.startsWith(monthFilter))
                     .slice(0, 5)}
-                  onDelete={handleDeleteMovement}
+                    onDelete={requestDeleteMovement}
                   emptyMessage="No hay movimientos. Agrega uno."
                 />
               </motion.div>
@@ -266,10 +416,31 @@ export default function SinglePageApp() {
               reduceMotion={reduceMotion}
               actions={
                 <>
+                  <input
+                    type="search"
+                    aria-label="Buscar movimientos"
+                    placeholder="Buscar..."
+                    value={movementSearch}
+                    onChange={(e) => cambiarBusqueda(e.target.value)}
+                    className="glass-soft min-w-44 bg-[#0a0e17] text-sm font-bold text-white border border-white/10 rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#3b82f6]"
+                  />
+                  <select
+                    aria-label="Filtrar por categoría"
+                    value={movementCategory}
+                    onChange={(e) => cambiarCategoria(e.target.value)}
+                    className="glass-soft min-w-44 bg-[#0a0e17] text-sm font-bold text-white border border-white/10 rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#3b82f6] [color-scheme:dark] cursor-pointer"
+                  >
+                    <option value="">Todas las categorías</option>
+                    {categories.map((categoria) => (
+                      <option key={categoria.id_categoria} value={categoria.id_categoria}>
+                        {categoria.nombre_categoria}
+                      </option>
+                    ))}
+                  </select>
                   <select
                     aria-label="Filtrar por mes"
                     value={monthFilter}
-                    onChange={(e) => setMonthFilter(e.target.value)}
+                    onChange={(e) => cambiarMes(e.target.value)}
                     className="glass-soft min-w-44 bg-[#0a0e17] text-sm font-bold text-white border border-white/10 rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#3b82f6] [color-scheme:dark] cursor-pointer"
                   >
                     <option value="">Todos los meses</option>
@@ -279,6 +450,9 @@ export default function SinglePageApp() {
                       </option>
                     ))}
                   </select>
+                  <button type="button" onClick={() => void exportarMovimientos()} className="btn-ghost">
+                    <Download size={18} /> CSV
+                  </button>
                   <button
                     type="button"
                     onClick={() => openMovementModal(currentTab === 'ingresos' ? 'ingreso' : 'gasto')}
@@ -290,19 +464,49 @@ export default function SinglePageApp() {
               }
             />
             <div className="glass-card rounded-3xl p-5">
-              <MovementsList
-                movements={movementsFiltered}
-                onDelete={handleDeleteMovement}
-                variant="full"
-                emptyIcon={
-                  currentTab === 'ingresos' ? (
-                    <TrendingUp size={64} className="opacity-20 mb-4" />
-                  ) : (
-                    <TrendingDown size={64} className="opacity-20 mb-4" />
-                  )
-                }
-                emptyMessage={`Aún no hay registros en la categoría de ${currentTab}.`}
-              />
+              {movementListError && (
+                <p className="mb-4 text-sm font-bold text-red-400">{movementListError}</p>
+              )}
+              {movementListLoading ? (
+                <p className="py-10 text-center text-sm text-gray-400">Cargando movimientos...</p>
+              ) : (
+                <MovementsList
+                  movements={movementList}
+                  onDelete={requestDeleteMovement}
+                  variant="full"
+                  emptyIcon={
+                    currentTab === 'ingresos' ? (
+                      <TrendingUp size={64} className="opacity-20 mb-4" />
+                    ) : (
+                      <TrendingDown size={64} className="opacity-20 mb-4" />
+                    )
+                  }
+                  emptyMessage={`Aún no hay registros en la categoría de ${currentTab}.`}
+                />
+              )}
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
+                <button
+                  type="button"
+                  disabled={movementPage === 0 || movementListLoading}
+                  onClick={() => setMovementPage((pagina) => Math.max(0, pagina - 1))}
+                  className="btn-ghost disabled:opacity-40"
+                >
+                  Anterior
+                </button>
+                <span className="text-xs font-bold text-gray-400">
+                  Página {movementPage + 1} de {Math.max(1, Math.ceil(movementTotal / MOVEMENT_PAGE_SIZE))}
+                </span>
+                <button
+                  type="button"
+                  disabled={
+                    (movementPage + 1) * MOVEMENT_PAGE_SIZE >= movementTotal || movementListLoading
+                  }
+                  onClick={() => setMovementPage((pagina) => pagina + 1)}
+                  className="btn-ghost disabled:opacity-40"
+                >
+                  Siguiente
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
@@ -374,7 +578,7 @@ export default function SinglePageApp() {
                       </div>
                       <MetaProgress
                         meta={meta}
-                        onDelete={handleDeleteGoal}
+                        onDelete={requestDeleteGoal}
                         projectedAmount={projectedAmount}
                       />
                       <button
@@ -436,6 +640,9 @@ export default function SinglePageApp() {
             }
           />
           <div className="glass-card rounded-3xl p-5">
+            {budgetUpdateError && (
+              <p className="mb-4 text-sm font-bold text-red-400">{budgetUpdateError}</p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {data.presupuestos.length === 0 ? (
                 <div className="col-span-full py-16 flex flex-col items-center justify-center text-gray-500">
@@ -447,7 +654,8 @@ export default function SinglePageApp() {
                   <PresupuestoProgress
                     key={p.id}
                     presupuesto={p}
-                    onDelete={handleDeleteBudget}
+                    onDelete={requestDeleteBudget}
+                    onUpdate={handleUpdateBudget}
                   />
                 ))
               )}
@@ -475,7 +683,7 @@ export default function SinglePageApp() {
 
       <BottomNav
         currentTab={currentTab}
-        onTabChange={setCurrentTab}
+        onTabChange={cambiarTab}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
         onLogout={logout}
       />

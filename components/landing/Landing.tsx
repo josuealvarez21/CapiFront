@@ -1,13 +1,16 @@
 'use client';
 
 import { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import LandingNav from '@/components/landing/LandingNav';
 import Hero from '@/components/landing/Hero';
 import FeatureBento from '@/components/landing/FeatureBento';
 import HowItWorks from '@/components/landing/HowItWorks';
-import InteractiveDemo from '@/components/landing/InteractiveDemo';
+const InteractiveDemo = dynamic(() => import('@/components/landing/InteractiveDemo'), {
+  loading: () => <div className="min-h-[24rem]" aria-hidden="true" />,
+});
 import FinalCTA from '@/components/landing/FinalCTA';
 import FaqSection from '@/components/landing/FaqSection';
 import MobileCTA from '@/components/landing/MobileCTA';

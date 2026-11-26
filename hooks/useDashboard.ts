@@ -95,7 +95,7 @@ export function useDashboard() {
       return api.dashboard.get(token);
     },
     enabled: !!token && !authLoading,
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
     retry: (failureCount, error) => {
       if (error instanceof UnauthorizedError) return false;
@@ -118,6 +118,14 @@ export function useDashboard() {
     },
   });
 
+  const getMovementType = useCallback(
+    (idCategoria: number) =>
+      categoriesData?.find((categoria) => categoria.id_categoria === idCategoria)?.tipo === 'ingreso'
+        ? 'ingreso'
+        : 'gasto',
+    [categoriesData],
+  );
+
   // --- Mutations with Optimistic Updates ---
 
   // Create Movement
@@ -132,11 +140,12 @@ export function useDashboard() {
 
       queryClient.setQueryData<DashboardData | undefined>(DASHBOARD_QUERY_KEY, (old) => {
         if (!old) return old;
+        const tipo = getMovementType(newMovement.id_categoria);
         const tempMovement = {
           id: `temp-${Date.now()}`,
           descripcion: newMovement.descripcion || 'Movimiento',
           monto: newMovement.monto,
-          tipo: newMovement.id_categoria <= 6 ? 'gasto' : 'ingreso',
+          tipo,
           categoria: '',
           fecha: newMovement.fecha,
         };
@@ -145,9 +154,9 @@ export function useDashboard() {
           ultimos_movimientos: [tempMovement, ...old.ultimos_movimientos.slice(0, 4)],
           summary: {
             ...old.summary,
-            ingresos_mes: newMovement.id_categoria > 6 ? old.summary.ingresos_mes + newMovement.monto : old.summary.ingresos_mes,
-            gastos_mes: newMovement.id_categoria <= 6 ? old.summary.gastos_mes + newMovement.monto : old.summary.gastos_mes,
-            balance_total: newMovement.id_categoria > 6
+            ingresos_mes: tipo === 'ingreso' ? old.summary.ingresos_mes + newMovement.monto : old.summary.ingresos_mes,
+            gastos_mes: tipo === 'gasto' ? old.summary.gastos_mes + newMovement.monto : old.summary.gastos_mes,
+            balance_total: tipo === 'ingreso'
               ? old.summary.balance_total + newMovement.monto
               : old.summary.balance_total - newMovement.monto,
           },
@@ -164,6 +173,7 @@ export function useDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['movimientos'] });
     },
     onSettled: () => {
       setIsSubmitting(false);
@@ -208,6 +218,7 @@ export function useDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['movimientos'] });
     },
   });
 
@@ -460,17 +471,17 @@ export function useDashboard() {
   };
 
   const handleDeleteMovement = async (id: string) => {
-    if (!token || !confirm('¿Estás seguro de eliminar este movimiento?')) return;
+    if (!token) return;
     deleteMovementMutation.mutate(id);
   };
 
   const handleDeleteGoal = async (id: string) => {
-    if (!token || !confirm('¿Estás seguro de eliminar esta meta?')) return;
+    if (!token) return;
     deleteGoalMutation.mutate(id);
   };
 
   const handleDeleteBudget = async (id: string) => {
-    if (!token || !confirm('¿Estás seguro de eliminar este presupuesto?')) return;
+    if (!token) return;
     deleteBudgetMutation.mutate(id);
   };
 

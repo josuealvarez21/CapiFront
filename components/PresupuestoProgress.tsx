@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trash2, TrendingUp } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
@@ -8,14 +9,27 @@ import type { Presupuesto } from '@/lib/types';
 interface PresupuestoProgressProps {
   presupuesto: Presupuesto;
   onDelete: (id: string) => void;
+  onUpdate?: (id: string, limite: number) => Promise<void> | void;
 }
 
-export default function PresupuestoProgress({ presupuesto, onDelete }: PresupuestoProgressProps) {
+export default function PresupuestoProgress({ presupuesto, onDelete, onUpdate }: PresupuestoProgressProps) {
   const gastado = Number(presupuesto.gastado || 0);
   const limite = Number(presupuesto.limite || 0);
   const porcentaje = limite > 0 ? (gastado / limite) * 100 : 0;
   const esExcedido = gastado > limite;
   const montoDiferencia = Math.abs(limite - gastado);
+  const [editando, setEditando] = useState(false);
+  const [nuevoLimite, setNuevoLimite] = useState(String(limite));
+  const [guardando, setGuardando] = useState(false);
+
+  const guardarLimite = async () => {
+    const valor = Number(nuevoLimite);
+    if (!Number.isFinite(valor) || valor <= 0 || !onUpdate) return;
+    setGuardando(true);
+    await onUpdate(presupuesto.id, valor);
+    setGuardando(false);
+    setEditando(false);
+  };
 
   return (
     <div
@@ -39,14 +53,57 @@ export default function PresupuestoProgress({ presupuesto, onDelete }: Presupues
               : `Te quedan ${formatCurrency(montoDiferencia)} disponibles`}
           </p>
         </div>
-        <button
-          onClick={() => onDelete(presupuesto.id)}
-          aria-label={`Eliminar presupuesto de ${presupuesto.categoria}`}
-          className="shrink-0 p-1 text-gray-600 transition-colors hover:text-red-400"
-        >
-          <Trash2 size={18} />
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          {onUpdate && (
+            <button
+              type="button"
+              onClick={() => {
+                setNuevoLimite(String(limite));
+                setEditando((valor) => !valor);
+              }}
+              className="text-xs font-bold text-[#60a5fa] transition-colors hover:text-white"
+            >
+              Editar
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => onDelete(presupuesto.id)}
+            aria-label={`Eliminar presupuesto de ${presupuesto.categoria}`}
+            className="p-1 text-gray-600 transition-colors hover:text-red-400"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
       </div>
+      {editando && (
+        <div className="relative z-10 mb-3 flex flex-wrap items-center gap-2">
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            aria-label={`Nuevo límite para ${presupuesto.categoria}`}
+            value={nuevoLimite}
+            onChange={(e) => setNuevoLimite(e.target.value)}
+            className="glass-soft w-32 rounded-lg bg-[#0a0e17] px-3 py-1.5 text-sm font-bold text-white border border-white/10 focus:outline-none focus:border-[#3b82f6]"
+          />
+          <button
+            type="button"
+            disabled={guardando}
+            onClick={() => void guardarLimite()}
+            className="btn-primary px-3 py-1.5 text-xs disabled:opacity-40"
+          >
+            Guardar
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditando(false)}
+            className="btn-ghost px-3 py-1.5 text-xs"
+          >
+            Cancelar
+          </button>
+        </div>
+      )}
       <div className="relative z-10 mb-3 flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
         <span
           className={`truncate text-xl font-black sm:text-2xl ${esExcedido ? 'text-red-500' : 'text-white'}`}

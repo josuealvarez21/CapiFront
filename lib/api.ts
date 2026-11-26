@@ -6,6 +6,8 @@ import type {
   AdminUserDetail,
   AdminUserUpdate,
   ChatModo,
+  MovimientosPage,
+  Transaccion,
 } from './types';
 import { API_URL } from './public-urls';
 
@@ -125,6 +127,31 @@ export interface ReporteMensualCrudo {
     categoria: string;
     fecha: string;
   }[];
+}
+
+export interface MovimientosListParams {
+  skip?: number;
+  limit?: number;
+  fecha_desde?: string;
+  fecha_hasta?: string;
+  id_categoria?: number;
+  busqueda?: string;
+  tipo?: string;
+}
+
+function buildMovementsQuery(params: MovimientosListParams): string {
+  const searchParams = new URLSearchParams();
+  if (params.skip !== undefined) searchParams.set('skip', String(params.skip));
+  if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+  if (params.fecha_desde) searchParams.set('fecha_desde', params.fecha_desde);
+  if (params.fecha_hasta) searchParams.set('fecha_hasta', params.fecha_hasta);
+  if (params.id_categoria !== undefined) {
+    searchParams.set('id_categoria', String(params.id_categoria));
+  }
+  if (params.busqueda) searchParams.set('busqueda', params.busqueda);
+  if (params.tipo) searchParams.set('tipo', params.tipo);
+  const qs = searchParams.toString();
+  return qs ? `?${qs}` : '';
 }
 
 export const api = {
@@ -273,6 +300,53 @@ export const api = {
         body: JSON.stringify(data),
       }),
 
+    list: async (token: string, params: MovimientosListParams = {}): Promise<MovimientosPage> => {
+      const response = await fetch(
+        `${API_BASE}/api/v1/movements/${buildMovementsQuery(params)}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (response.status === 401) throw new UnauthorizedError();
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new ApiError(errorBody.detail || `Error ${response.status}`, response.status);
+      }
+
+      const items = (await response.json()) as Transaccion[];
+      return {
+        items,
+        total: Number(response.headers.get('x-total-count') || items.length),
+        skip: Number(response.headers.get('x-skip') || params.skip || 0),
+        limit: Number(response.headers.get('x-limit') || params.limit || 100),
+      };
+    },
+
+    exportCsv: async (token: string, params: MovimientosListParams = {}): Promise<void> => {
+      const response = await fetch(
+        `${API_BASE}/api/v1/movements/export${buildMovementsQuery(params)}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (response.status === 401) throw new UnauthorizedError();
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new ApiError(errorBody.detail || `Error ${response.status}`, response.status);
+      }
+
+      const disposition = response.headers.get('Content-Disposition') || '';
+      const filenameMatch = disposition.match(/filename\*?=(?:UTF-8'')?["']?([^;"']+)/i);
+      const filename = filenameMatch ? decodeURIComponent(filenameMatch[1]) : 'movimientos.csv';
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    },
+
     delete: (token: string, id: string) =>
       apiRequest(`/api/v1/movements/${id}`, { method: 'DELETE', token }),
   },
@@ -326,6 +400,21 @@ export const api = {
         token,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
+      }),
+
+    update: (token: string, id: string, montoLimite: number) =>
+      apiRequest<{
+        id_presupuesto: number;
+        id_usuario: number;
+        id_categoria: number;
+        monto_limite: DecimalStr;
+        mes: number;
+        anio: number;
+      }>(`/api/v1/budgets/${id}`, {
+        method: 'PUT',
+        token,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ monto_limite: montoLimite }),
       }),
 
     delete: (token: string, id: string) =>
