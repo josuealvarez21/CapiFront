@@ -252,7 +252,7 @@ export default function RegisterPage() {
 
           <div className="space-y-2">
             <label className="text-[11px] font-black text-gray-500 uppercase tracking-[2px] ml-1">
-              Contraseña de Bóveda
+              Contraseña
             </label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-600 group-focus-within:text-[#22c55e] transition-colors">
@@ -364,7 +364,7 @@ export default function RegisterPage() {
             disabled={isLoading || Object.keys(errores).length > 0}
             className="w-full bg-gradient-to-r from-[#22c55e] to-[#16a34a] hover:shadow-[0_8px_24px_-8px_rgba(34,197,94,0.5)] text-white py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
           >
-            {isLoading ? 'Creando Acceso...' : 'Sellar Mi Registro'}
+            {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
             {!isLoading && (
               <Sparkles size={20} className="group-hover:rotate-12 transition-transform" />
             )}

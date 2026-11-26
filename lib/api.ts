@@ -13,6 +13,15 @@ import { API_URL } from './public-urls';
 
 const API_BASE = API_URL;
 
+/**
+ * Clave única por operación de escritura. El backend la guarda solo como hash
+ * para que un doble clic o un reintento de red no duplique movimientos ni abonos.
+ */
+function idempotencyHeaders(): Record<string, string> {
+  const random = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+  return { 'Idempotency-Key': random };
+}
+
 /** Las fotos nuevas se sirven desde la BD mediante un token opaco. */
 export function resolvePhotoUrl(value?: string | null): string {
   if (!value) return '';
@@ -318,7 +327,7 @@ export const api = {
       apiRequest('/api/v1/movements/', {
         method: 'POST',
         token,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...idempotencyHeaders() },
         body: JSON.stringify(data),
       }),
 
@@ -399,7 +408,7 @@ export const api = {
       apiRequest('/api/v1/goals/', {
         method: 'POST',
         token,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...idempotencyHeaders() },
         body: JSON.stringify(data),
       }),
 
@@ -410,7 +419,7 @@ export const api = {
       apiRequest(`/api/v1/goals/${id}`, {
         method: 'PUT',
         token,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...idempotencyHeaders() },
         body: JSON.stringify({ monto_adicional: montoAdicional }),
       }),
 
@@ -418,7 +427,7 @@ export const api = {
       apiRequest('/api/v1/goals/bulk-allocate/', {
         method: 'POST',
         token,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...idempotencyHeaders() },
         body: JSON.stringify(allocations),
       }),
 
@@ -440,7 +449,7 @@ export const api = {
       apiRequest('/api/v1/budgets/', {
         method: 'POST',
         token,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...idempotencyHeaders() },
         body: JSON.stringify(data),
       }),
 

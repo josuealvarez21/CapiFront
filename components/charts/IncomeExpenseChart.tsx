@@ -97,9 +97,10 @@ function buildFlujoSeries(movements: Transaccion[]) {
 
 function compactCurrency(value: number): string {
   const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${Math.round(value / 1_000)}k`;
-  return `$${value}`;
+  const simbolo = Math.sign(value) < 0 ? '-' : '';
+  if (abs >= 1_000_000) return `${simbolo}${(abs / 1_000_000).toFixed(1)}M COP`;
+  if (abs >= 1_000) return `${simbolo}${Math.round(abs / 1_000)}k COP`;
+  return `${simbolo}${abs} COP`;
 }
 
 export default function IncomeExpenseChart({ summary, movements }: IncomeExpenseChartProps) {

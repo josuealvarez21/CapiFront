@@ -8,6 +8,10 @@ const publicRoutes = [
   '/guia-finanzas-personales',
   '/guias/presupuestos',
   '/guias/metas-de-ahorro',
+  '/privacidad',
+  '/tratamiento-datos',
+  '/terminos',
+  '/soporte',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -139,7 +139,7 @@ export default function LoginPage() {
 
             <div className="mb-3 inline-flex items-center gap-2 rounded-full glass-soft px-3 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.9)] motion-safe:animate-pulse" />
-              <span className="eyebrow text-gray-400">Bóveda Cápi</span>
+              <span className="eyebrow text-gray-400">Cápi</span>
             </div>
             <h1 className="neon-text text-3xl font-black tracking-tight sm:text-4xl">
               Bienvenido a Cápi
@@ -282,7 +282,7 @@ export default function LoginPage() {
             >
               <span className="pointer-events-none absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-all duration-700 group-hover:left-full" />
               <span className="relative flex items-center justify-center gap-3">
-                {isLoading ? 'Iniciando Sesión...' : 'Entrar a la Bóveda'}
+                {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
                 {!isLoading && (
                   <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
                 )}

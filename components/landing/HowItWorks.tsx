@@ -13,7 +13,7 @@ const steps: { number: string; title: string; description: string; icon: LucideI
     number: '01',
     title: 'Crea tu cuenta',
     description:
-      'Regístrate con tu correo o con Google y entra a la Bóveda en cuestión de segundos.',
+      'Regístrate con tu correo o con Google y entra a tu dashboard en cuestión de segundos.',
     icon: UserPlus,
   },
   {

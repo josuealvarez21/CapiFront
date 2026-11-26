@@ -257,7 +257,7 @@ export const guides: GuideContent[] = [
       {
         question: '¿Es mejor ahorrar o pagar deudas primero?',
         answer:
-          'Cuba un pequeño fondo de emergencia y luego prioriza deudas con intereses altos. Después retoma tus metas de ahorro con más tranquilidad.',
+          'Crea un pequeño fondo de emergencia y luego prioriza deudas con intereses altos. Después retoma tus metas de ahorro con más tranquilidad.',
       },
     ],
     parent: '/guia-finanzas-personales',

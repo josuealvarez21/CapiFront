@@ -43,6 +43,30 @@ export default function LandingFooter() {
           >
             Registro
           </Link>
+          <Link
+            href="/privacidad"
+            className="text-xs font-bold text-gray-400 transition-colors hover:text-white"
+          >
+            Privacidad
+          </Link>
+          <Link
+            href="/tratamiento-datos"
+            className="text-xs font-bold text-gray-400 transition-colors hover:text-white"
+          >
+            Tratamiento de datos
+          </Link>
+          <Link
+            href="/terminos"
+            className="text-xs font-bold text-gray-400 transition-colors hover:text-white"
+          >
+            Términos
+          </Link>
+          <Link
+            href="/soporte"
+            className="text-xs font-bold text-gray-400 transition-colors hover:text-white"
+          >
+            Soporte
+          </Link>
         </nav>
 
         <p className="text-center text-[11px] text-gray-600">

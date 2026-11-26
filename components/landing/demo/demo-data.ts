@@ -235,14 +235,14 @@ export function generateReply(
       };
     }
 
-    return { content: 'Decime el monto, por ejemplo: “Registra $85.000 en comida”.' };
+    return { content: 'Dime el monto, por ejemplo: “Registra $85.000 en comida”.' };
   }
 
   if (/comida|mercado|gaste|gasto|gastar/.test(t)) {
     const comida =
       categoryBreakdown(ctx.movimientos, ctx.mes, 'gasto').find((c) => c.nombre === 'Comida')?.monto ?? 0;
     return {
-      content: `En ${etiqueta} gastaste ${money(comida)} en Comida. Si querés, decime “registra $85.000 en comida” y lo agrego.`,
+      content: `En ${etiqueta} gastaste ${money(comida)} en Comida. Si quieres, dime “registra $85.000 en comida” y lo agrego.`,
     };
   }
 
@@ -258,17 +258,17 @@ export function generateReply(
     if (!meta) return { content: 'Todavía no hay metas cargadas en la demo.' };
     const porcentaje = Math.round((meta.actual / meta.objetivo) * 100);
     return {
-      content: `Vas en ${porcentaje}% de “${meta.nombre}”: ${money(meta.actual)} de ${money(meta.objetivo)}. Probá el planificador de metas en la otra pestaña.`,
+      content: `Vas en ${porcentaje}% de “${meta.nombre}”: ${money(meta.actual)} de ${money(meta.objetivo)}. Prueba el planificador de metas en la otra pestaña.`,
     };
   }
 
   if (/presupuesto|limite/.test(t)) {
     return {
-      content: 'Tus límites están bajo control. En la demo podés cambiar de mes en la pestaña Reporte para comparar.',
+      content: 'Tus límites están bajo control. En la demo puedes cambiar de mes en la pestaña Reporte para comparar.',
     };
   }
 
   return {
-    content: 'Puedo ayudarte con tus gastos, tu balance o tus metas. Probá: “¿cuánto gasté en comida?” o “registra $85.000 en comida”.',
+    content: 'Puedo ayudarte con tus gastos, tu balance o tus metas. Prueba: “¿cuánto gasté en comida?” o “registra $85.000 en comida”.',
   };
 }

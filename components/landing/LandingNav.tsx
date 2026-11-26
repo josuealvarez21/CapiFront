@@ -16,7 +16,7 @@ const anchors = [
 export default function LandingNav() {
   const { token, loading } = useAuth();
   const ctaHref = token ? '/app' : '/login';
-  const ctaLabel = token ? 'Ir al dashboard' : 'Entrar a la Bóveda';
+  const ctaLabel = token ? 'Ir al dashboard' : 'Iniciar sesión';
 
   return (
     <motion.header
