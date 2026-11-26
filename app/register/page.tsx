@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
 import { trackEvent } from '@/lib/analytics';
+import { validateConfirmPassword, validatePassword } from '@/lib/validation';
 import TurnstileField from '@/components/security/TurnstileField';
 
 export default function RegisterPage() {
@@ -44,21 +45,11 @@ export default function RegisterPage() {
     return undefined;
   };
 
-  const validarCampoPassword = (valor: string): string | undefined => {
-    if (!valor) return 'La contraseña es obligatoria';
-    if (/[<>'"\\`]/.test(valor))
-      return 'La contraseña contiene caracteres no permitidos (< > \' " \\ `)';
-    if (valor !== valor.trim()) return 'La contraseña no puede tener espacios al inicio ni al final';
-    if (valor.length < 8 || !/[A-Z]/.test(valor) || !/[a-z]/.test(valor) || !/[^a-zA-Z0-9]/.test(valor))
-      return 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un símbolo (ej. . , @ _)';
-    return undefined;
-  };
+  const validarCampoPassword = (valor: string): string | undefined =>
+    validatePassword(valor);
 
-  const validarCampoConfirmar = (valor: string): string | undefined => {
-    if (valor !== valor.trim()) return 'La contraseña no puede tener espacios al inicio ni al final';
-    if (password !== valor) return 'Las contraseñas no coinciden';
-    return undefined;
-  };
+  const validarCampoConfirmar = (valor: string): string | undefined =>
+    validateConfirmPassword(valor, password);
 
   const validarFormulario = (): boolean => {
     const nuevos: typeof errores = {};
@@ -269,6 +260,7 @@ export default function RegisterPage() {
               </div>
               <input
                 type={mostrarPassword ? 'text' : 'password'}
+                autoComplete="new-password"
                 required
                 value={password}
                 onChange={(e) => {
@@ -327,6 +319,7 @@ export default function RegisterPage() {
               </div>
               <input
                 type={mostrarConfirmarPassword ? 'text' : 'password'}
+                autoComplete="new-password"
                 required
                 value={confirmarPassword}
                 onChange={(e) => {

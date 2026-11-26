@@ -87,9 +87,11 @@ export default function Sidebar({
 }: SidebarProps) {
   const { rol } = useAuth();
   const router = useRouter();
-  const [avatarError, setAvatarError] = useState(false);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=121212&color=fff`;
-  const avatarSrc = avatarError || !user.foto_perfil ? fallbackUrl : resolvePhotoUrl(user.foto_perfil);
+  const avatarSrc = !user.foto_perfil ? fallbackUrl : resolvePhotoUrl(user.foto_perfil);
+  const displaySrc = failedSrc === avatarSrc ? fallbackUrl : avatarSrc;
+
   return (
     <aside className="w-60 lg:w-64 glass-soft border-r border-white/10 hidden md:flex flex-col z-10 sticky top-0 h-screen shadow-2xl">
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
@@ -103,12 +105,12 @@ export default function Sidebar({
         <div className="px-5 pb-4 flex items-center gap-3">
           <div className="w-10 lg:w-12 h-10 lg:h-12 rounded-full bg-gradient-to-tr from-[#3b82f6] to-[#22c55e] p-[2px] shadow-lg shrink-0">
             <Image
-              src={avatarSrc}
+              src={displaySrc}
               alt={`Foto de perfil de ${user.nombre}`}
               width={48}
               height={48}
               unoptimized
-              onError={() => setAvatarError(true)}
+              onError={() => setFailedSrc(avatarSrc)}
               className="h-full w-full rounded-full border-2 border-[#0a0e17] object-cover"
             />
           </div>

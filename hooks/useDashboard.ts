@@ -17,7 +17,7 @@ const DASHBOARD_QUERY_KEY = ['dashboard'];
 const CATEGORIES_QUERY_KEY = ['categories'];
 
 export function useDashboard() {
-  const { token, logout, loading: authLoading } = useAuth();
+  const { token, logout, loading: authLoading, setUser } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -361,7 +361,10 @@ export function useDashboard() {
       if (!token) throw new Error('No token');
       return api.users.updateProfile(token, formDataToSend);
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      setUser((prev) =>
+        prev ? { ...prev, nombre: result?.nombre ?? prev.nombre, foto_perfil: result?.foto_perfil ?? prev.foto_perfil } : prev,
+      );
       queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
       setProfileNameDraft(null);
       setIsUploadingProfilePic(false);

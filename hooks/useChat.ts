@@ -54,6 +54,7 @@ export function useChat(onDataChange?: () => void) {
     async (reader: ReadableStreamDefaultReader<Uint8Array>) => {
       const decoder = new TextDecoder();
       let buffer = '';
+      let sawFinal = false;
 
       try {
         while (true) {
@@ -82,24 +83,35 @@ export function useChat(onDataChange?: () => void) {
                     args: event.args || {},
                     temp_id: event.temp_id || '',
                   });
+                  sawFinal = true;
                   setIsLoading(false);
                   break;
                 case 'done':
+                  sawFinal = true;
                   setIsLoading(false);
                   break;
                 case 'error':
+                  sawFinal = true;
                   updateLastMessage(`Error: ${event.content}`);
                   setIsLoading(false);
                   break;
                 case 'result':
+                  sawFinal = true;
                   addMessage('assistant', event.content || '');
                   setIsLoading(false);
                   break;
+                default:
+                  sawFinal = true;
+                  updateLastMessage('No pude interpretar una parte de la respuesta.');
               }
             } catch {
-              // skip malformed JSON
+              sawFinal = true;
+              updateLastMessage('No pude interpretar una parte de la respuesta.');
             }
           }
+        }
+        if (!sawFinal) {
+          updateLastMessage('La respuesta se cortó. Intenta de nuevo.');
         }
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {
@@ -187,9 +199,9 @@ export function useChat(onDataChange?: () => void) {
         setConfirmation(null);
         setIsLoading(false);
         if (result.type === 'error') {
-          addMessage('assistant', `Error: ${result.content}`);
+          addMessage('assistant', `Error: ${result.content || 'No se pudo completar la operación.'}`);
         } else {
-          addMessage('assistant', result.content);
+          addMessage('assistant', result.content || 'Operación completada.');
           onDataChangeRef.current?.();
         }
       } catch {
