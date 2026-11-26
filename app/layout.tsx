@@ -6,8 +6,9 @@ import { AuthProvider } from '../context/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
+import { SITE_URL } from '@/lib/public-urls';
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '');
+const siteUrl = SITE_URL;
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

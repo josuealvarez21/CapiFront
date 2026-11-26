@@ -1,13 +1,7 @@
 import type { NextConfig } from 'next';
+import { API_URL } from './lib/public-urls';
 
-const apiOrigin = (() => {
-  const raw = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-  try {
-    return new URL(raw).origin;
-  } catch {
-    return 'http://localhost:8000';
-  }
-})();
+const apiOrigin = API_URL;
 
 const csp = [
   "default-src 'self'",
