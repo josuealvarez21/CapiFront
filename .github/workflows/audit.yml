@@ -24,10 +24,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          NEXT_PUBLIC_SITE_URL: https://tu-dominio.com
-          NEXT_PUBLIC_API_URL: https://tu-backend.koyeb.app
+          NEXT_PUBLIC_SITE_URL: https://capi-front-ten.vercel.app
+          NEXT_PUBLIC_API_URL: https://capibackend-2.onrender.com
       - name: Lighthouse CI
         run: npm run lighthouse
         env:
-          NEXT_PUBLIC_SITE_URL: https://tu-dominio.com
-          NEXT_PUBLIC_API_URL: https://tu-backend.koyeb.app
+          NEXT_PUBLIC_SITE_URL: https://capi-front-ten.vercel.app
+          NEXT_PUBLIC_API_URL: https://capibackend-2.onrender.com

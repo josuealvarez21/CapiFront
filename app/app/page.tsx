@@ -15,10 +15,10 @@ import {
   Download,
 } from 'lucide-react';
 import { useDashboard } from '@/hooks/useDashboard';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, parseAmountForBackend } from '@/lib/utils';
 import { getProjectedForMeta } from '@/lib/savings';
 import { api } from '@/lib/api';
-import type { TabType } from '@/lib/types';
+import type { Meta, TabType, Transaccion } from '@/lib/types';
 import { tabSwap } from '@/lib/motion';
 
 import Sidebar from '@/components/Sidebar';
@@ -35,6 +35,7 @@ import PresupuestoProgress from '@/components/PresupuestoProgress';
 import SavingsPlanner from '@/components/SavingsPlanner';
 import MovementModal from '@/components/modals/MovementModal';
 import GoalModal from '@/components/modals/GoalModal';
+import HistorialAportesModal from '@/components/modals/HistorialAportesModal';
 import BudgetModal from '@/components/modals/BudgetModal';
 import SettingsModal from '@/components/modals/SettingsModal';
 import ConfirmDialog, { type ConfirmOptions } from '@/components/modals/ConfirmDialog';
@@ -53,6 +54,15 @@ export default function SinglePageApp() {
   const [movementPage, setMovementPage] = useState(0);
   const [budgetUpdateError, setBudgetUpdateError] = useState('');
   const [pendingConfirm, setPendingConfirm] = useState<ConfirmOptions | null>(null);
+  const [movimientoEditando, setMovimientoEditando] = useState<Transaccion | null>(null);
+  const [formDataEdicion, setFormDataEdicion] = useState({
+    monto: '',
+    descripcion: '',
+    id_categoria: '',
+    fecha: '',
+  });
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+  const [metaHistorial, setMetaHistorial] = useState<Meta | null>(null);
 
   const {
     token,
@@ -103,6 +113,7 @@ export default function SinglePageApp() {
     selectedGoalIds,
     setSelectedGoalIds,
     showSuccessFeedback,
+    setShowSuccessFeedback,
     showFeedback,
     fetchData,
   } = dashboard;
@@ -191,6 +202,45 @@ export default function SinglePageApp() {
       });
     } catch {
       showFeedback('No se pudo descargar el CSV.');
+    }
+  };
+
+  const requestEditMovement = (movimiento: Transaccion) => {
+    const categoria = categories.find((item) => item.nombre_categoria === movimiento.categoria);
+    setFormDataEdicion({
+      monto: String(movimiento.monto),
+      descripcion: movimiento.descripcion,
+      id_categoria: categoria ? String(categoria.id_categoria) : '',
+      fecha: movimiento.fecha,
+    });
+    setMovimientoEditando(movimiento);
+  };
+
+  const handleEditMovement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token || !movimientoEditando) return;
+
+    const monto = parseAmountForBackend(formDataEdicion.monto);
+    if (!formDataEdicion.id_categoria || monto <= 0) {
+      showFeedback('Revisa la categoría y el monto del movimiento.');
+      return;
+    }
+
+    setIsEditSubmitting(true);
+    try {
+      await api.movements.update(token, movimientoEditando.id, {
+        id_categoria: Number(formDataEdicion.id_categoria),
+        monto,
+        descripcion: formDataEdicion.descripcion.trim(),
+        fecha: formDataEdicion.fecha,
+      });
+      setShowSuccessFeedback('Movimiento actualizado correctamente.');
+      setMovimientoEditando(null);
+      await Promise.all([fetchData(), refetchMovimientos()]);
+    } catch {
+      showFeedback('No se pudo actualizar el movimiento.');
+    } finally {
+      setIsEditSubmitting(false);
     }
   };
 
@@ -392,6 +442,7 @@ export default function SinglePageApp() {
                     .filter((m) => !monthFilter || m.fecha.startsWith(monthFilter))
                     .slice(0, 5)}
                     onDelete={requestDeleteMovement}
+                    onEdit={requestEditMovement}
                   emptyMessage="No hay movimientos. Agrega uno."
                 />
               </motion.div>
@@ -473,6 +524,7 @@ export default function SinglePageApp() {
                 <MovementsList
                   movements={movementList}
                   onDelete={requestDeleteMovement}
+                  onEdit={requestEditMovement}
                   variant="full"
                   emptyIcon={
                     currentTab === 'ingresos' ? (
@@ -579,6 +631,10 @@ export default function SinglePageApp() {
                       <MetaProgress
                         meta={meta}
                         onDelete={requestDeleteGoal}
+                        onVerHistorial={(id) => {
+                          const seleccionada = data.metas.find((item) => item.id === id);
+                          if (seleccionada) setMetaHistorial(seleccionada);
+                        }}
                         projectedAmount={projectedAmount}
                       />
                       <button
@@ -700,6 +756,20 @@ export default function SinglePageApp() {
         currentTab={currentTab}
         isSubmitting={isSubmitting}
       />
+      {movimientoEditando && (
+        <MovementModal
+          isOpen={!!movimientoEditando}
+          onClose={() => setMovimientoEditando(null)}
+          onSubmit={handleEditMovement}
+          formData={formDataEdicion}
+          setFormData={setFormDataEdicion}
+          categories={categories}
+          modalType={movimientoEditando.tipo === 'ingreso' ? 'ingreso' : 'gasto'}
+          currentTab={currentTab}
+          isSubmitting={isEditSubmitting}
+          mode="edit"
+        />
+      )}
       <GoalModal
         isOpen={isGoalModalOpen}
         onClose={() => setIsGoalModalOpen(false)}
@@ -708,6 +778,13 @@ export default function SinglePageApp() {
         setFormData={setGoalFormData}
         isSubmitting={isSubmitting}
       />
+      {metaHistorial && (
+        <HistorialAportesModal
+          isOpen={!!metaHistorial}
+          onClose={() => setMetaHistorial(null)}
+          meta={metaHistorial}
+        />
+      )}
       <BudgetModal
         isOpen={isBudgetModalOpen}
         onClose={() => setIsBudgetModalOpen(false)}

@@ -19,6 +19,7 @@ interface MovementModalProps {
   modalType: ModalMovementType;
   currentTab: string;
   isSubmitting: boolean;
+  mode?: 'create' | 'edit';
 }
 
 export default function MovementModal({
@@ -31,7 +32,9 @@ export default function MovementModal({
   modalType,
   currentTab,
   isSubmitting,
+  mode = 'create',
 }: MovementModalProps) {
+  const esEdicion = mode === 'edit';
   const categoriesFiltered =
     modalType === 'ingreso' || currentTab === 'ingresos'
       ? categories.filter((c) => c.tipo === 'ingreso')
@@ -40,7 +43,7 @@ export default function MovementModal({
         : categories;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Registrar Transacción">
+    <Modal isOpen={isOpen} onClose={onClose} title={esEdicion ? 'Editar Transacción' : 'Registrar Transacción'}>
       <form onSubmit={onSubmit} className="space-y-5">
         <div>
           <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">
@@ -108,7 +111,7 @@ export default function MovementModal({
           disabled={isSubmitting}
           className="w-full bg-gradient-to-r from-[#3b82f6] to-[#22c55e] hover:from-[#2563eb] hover:to-[#16a34a] text-white py-4 rounded-xl font-extrabold text-lg mt-6 transition-all duration-300 disabled:opacity-50 shadow-lg shadow-blue-900/30"
         >
-          {isSubmitting ? 'Encriptando...' : 'Confirmar Envio'}
+          {isSubmitting ? 'Guardando...' : esEdicion ? 'Guardar Cambios' : 'Confirmar Envio'}
         </button>
       </form>
     </Modal>

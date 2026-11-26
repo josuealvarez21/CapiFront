@@ -1,17 +1,23 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Trash2 } from 'lucide-react';
+import { History, Trash2 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import type { Meta } from '@/lib/types';
 
 interface MetaProgressProps {
   meta: Meta;
   onDelete: (id: string) => void;
+  onVerHistorial?: (id: string) => void;
   projectedAmount?: number;
 }
 
-export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: MetaProgressProps) {
+export default function MetaProgress({
+  meta,
+  onDelete,
+  onVerHistorial,
+  projectedAmount = 0,
+}: MetaProgressProps) {
   const currentActual = Number(meta.ahorro_actual || 0);
   const target = Number(meta.monto_objetivo || 0);
   const projected = Number(projectedAmount || 0);
@@ -60,6 +66,15 @@ export default function MetaProgress({ meta, onDelete, projectedAmount = 0 }: Me
             </span>{' '}
             / {formatCurrency(meta.monto_objetivo)}
           </span>
+          {onVerHistorial && (
+            <button
+              onClick={() => onVerHistorial(meta.id)}
+              aria-label={`Ver historial de aportes de ${meta.nombre}`}
+              className="shrink-0 p-1 text-gray-500 transition-colors hover:text-[#3b82f6]"
+            >
+              <History size={16} />
+            </button>
+          )}
           <button
             onClick={() => onDelete(meta.id)}
             aria-label={`Eliminar meta ${meta.nombre}`}
