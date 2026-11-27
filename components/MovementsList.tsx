@@ -71,7 +71,7 @@ export default function MovementsList({
           </div>
           <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-4">
             <span
-              className={`stat-value whitespace-nowrap font-extrabold tabular-nums ${amountSize} ${mov.tipo === 'ingreso' ? 'text-[#4ade80]' : 'text-white'}`}
+              className={`stat-value whitespace-nowrap font-extrabold tabular-nums text-white ${amountSize}`}
             >
               {mov.tipo === 'ingreso' ? '+' : '-'}
               {formatCurrency(mov.monto)}
