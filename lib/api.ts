@@ -309,6 +309,10 @@ export const api = {
         ...item,
         valor: Number(item.valor),
       }));
+      data.ultimos_movimientos = data.ultimos_movimientos.map((movimiento) => ({
+        ...movimiento,
+        monto: Number(movimiento.monto),
+      }));
       return data;
     },
   },
@@ -355,7 +359,10 @@ export const api = {
         throw new ApiError(errorBody.detail || `Error ${response.status}`, response.status);
       }
 
-      const items = (await response.json()) as Transaccion[];
+      const items = ((await response.json()) as Transaccion[]).map((movimiento) => ({
+        ...movimiento,
+        monto: Number(movimiento.monto),
+      }));
       return {
         items,
         total: Number(response.headers.get('x-total-count') || items.length),

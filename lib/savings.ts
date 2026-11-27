@@ -10,38 +10,40 @@ function getEqualAllocations(
   metas: Meta[],
   selectedGoalIds: string[],
 ): SavingsAllocation[] {
-  const selected = metas.filter(
-    (m) => selectedGoalIds.includes(m.id) && m.ahorro_actual < m.monto_objetivo,
-  );
-  if (selected.length === 0) return [];
+  const epsilon = 1e-6;
+  let remaining = totalToDistribute;
+  if (remaining <= epsilon) return [];
+
+  let pending = metas
+    .filter((m) => selectedGoalIds.includes(m.id) && m.ahorro_actual < m.monto_objetivo)
+    .map((m) => ({ id: m.id, room: m.monto_objetivo - m.ahorro_actual }))
+    .filter((m) => m.room > epsilon);
+
+  if (pending.length === 0) return [];
 
   const allocations = new Map<string, number>();
-  let remaining = totalToDistribute;
-  let pending = selected;
 
-  while (remaining > 0 && pending.length > 0) {
+  while (remaining > epsilon && pending.length > 0) {
     const share = remaining / pending.length;
-    const stillPending: Meta[] = [];
+    const nextPending: typeof pending = [];
 
     for (const meta of pending) {
-      const current = allocations.get(meta.id) ?? 0;
-      const room = meta.monto_objetivo - meta.ahorro_actual - current;
-      if (room <= share) {
-        if (room > 0) {
-          allocations.set(meta.id, current + room);
-          remaining -= room;
-        }
+      if (meta.room <= share + epsilon) {
+        allocations.set(meta.id, (allocations.get(meta.id) ?? 0) + meta.room);
+        remaining -= meta.room;
       } else {
-        allocations.set(meta.id, current + share);
+        allocations.set(meta.id, (allocations.get(meta.id) ?? 0) + share);
         remaining -= share;
-        stillPending.push(meta);
+        nextPending.push({ id: meta.id, room: meta.room - share });
       }
     }
 
-    pending = stillPending;
+    if (nextPending.length === pending.length) break;
+    pending = nextPending;
   }
 
-  return Array.from(allocations, ([id, monto]) => ({ id_meta: parseInt(id), monto }));
+  return Array.from(allocations, ([id, monto]) => ({ id_meta: parseInt(id), monto }))
+    .filter((allocation) => allocation.monto > epsilon);
 }
 
 /**
