@@ -1,5 +1,5 @@
 import React from 'react';
-import { Utensils, Home as HomeIcon, Car, Zap, TrendingUp, ShoppingCart } from 'lucide-react';
+import { Utensils, Home as HomeIcon, Car, Zap, TrendingUp, ShoppingCart, Users, Wallet } from 'lucide-react';
 
 /**
  * Format a number as Colombian Peso currency.
@@ -53,7 +53,10 @@ export const getCategoryIcon = (category: string, size = 24): React.ReactElement
     Alquiler: <HomeIcon size={size} />,
     Transporte: <Car size={size} />,
     Servicios: <Zap size={size} />,
-    Salario: <TrendingUp size={size} />,
+    'Apoyo familiar': <Users size={size} />,
+    Subsidios: <Wallet size={size} />,
+    Dividendos: <TrendingUp size={size} />,
+    Ventas: <ShoppingCart size={size} />,
   };
   return iconMap[category] || <ShoppingCart size={size} />;
 };
