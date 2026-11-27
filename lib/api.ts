@@ -364,32 +364,6 @@ export const api = {
       };
     },
 
-    exportCsv: async (token: string, params: MovimientosListParams = {}): Promise<void> => {
-      const response = await fetch(
-        `${API_BASE}/api/v1/movements/export${buildMovementsQuery(params)}`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-
-      if (response.status === 401) throw new UnauthorizedError();
-
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
-        throw new ApiError(errorBody.detail || `Error ${response.status}`, response.status);
-      }
-
-      const disposition = response.headers.get('Content-Disposition') || '';
-      const filenameMatch = disposition.match(/filename\*?=(?:UTF-8'')?["']?([^;"']+)/i);
-      const filename = filenameMatch ? decodeURIComponent(filenameMatch[1]) : 'movimientos.csv';
-      const url = URL.createObjectURL(await response.blob());
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    },
-
     delete: (token: string, id: string) =>
       apiRequest(`/api/v1/movements/${id}`, { method: 'DELETE', token }),
   },

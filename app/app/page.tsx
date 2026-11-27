@@ -12,7 +12,6 @@ import {
   MinusCircle,
   Target,
   Wallet,
-  Download,
 } from 'lucide-react';
 import { useDashboard } from '@/hooks/useDashboard';
 import { formatCurrency, parseAmountForBackend } from '@/lib/utils';
@@ -190,19 +189,6 @@ export default function SinglePageApp() {
   const cambiarMes = (valor: string) => {
     setMonthFilter(valor);
     setMovementPage(0);
-  };
-
-  const exportarMovimientos = async () => {
-    if (!token) return;
-    try {
-      await api.movements.exportCsv(token, {
-        ...parametrosMovimientos,
-        skip: undefined,
-        limit: undefined,
-      });
-    } catch {
-      showFeedback('No se pudo descargar el CSV.');
-    }
   };
 
   const requestEditMovement = (movimiento: Transaccion) => {
@@ -501,9 +487,6 @@ export default function SinglePageApp() {
                       </option>
                     ))}
                   </select>
-                  <button type="button" onClick={() => void exportarMovimientos()} className="btn-ghost">
-                    <Download size={18} /> CSV
-                  </button>
                   <button
                     type="button"
                     onClick={() => openMovementModal(currentTab === 'ingresos' ? 'ingreso' : 'gasto')}
