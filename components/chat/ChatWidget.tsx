@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { MessageCircle, X } from 'lucide-react';
 import { useChat } from '@/hooks/useChat';
@@ -27,6 +27,14 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
 
   const reduceMotion = useReducedMotion() ?? false;
   const [pendingClearConfirm, setPendingClearConfirm] = useState<ConfirmOptions | null>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
+
+  // La tarjeta de confirmación se añade al final: sin esto queda fuera del área
+  // visible y el usuario piensa que el bot nunca la mostró.
+  useEffect(() => {
+    const contenedor = messagesRef.current;
+    if (contenedor) contenedor.scrollTop = contenedor.scrollHeight;
+  }, [messages.length, confirmation, isLoading]);
 
   return (
     <>
@@ -78,7 +86,7 @@ export function ChatWidget({ onDataChange }: ChatWidgetProps) {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 space-y-3 overflow-y-auto px-3 py-4 custom-scrollbar sm:px-4">
+            <div ref={messagesRef} className="flex-1 space-y-3 overflow-y-auto px-3 py-4 custom-scrollbar sm:px-4">
               {messages.length === 0 && !isLoading && (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#3b82f6]/20 to-[#22c55e]/20">
