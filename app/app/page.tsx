@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useDashboard } from '@/hooks/useDashboard';
 import { formatCurrency, parseAmountForBackend } from '@/lib/utils';
-import { getProjectedForMeta } from '@/lib/savings';
+import { calculateSavingsDistribution } from '@/lib/savings';
 import { api } from '@/lib/api';
 import type { Meta, TabType, Transaccion } from '@/lib/types';
 import { tabSwap } from '@/lib/motion';
@@ -194,7 +194,7 @@ export default function SinglePageApp() {
   const requestEditMovement = (movimiento: Transaccion) => {
     const categoria = categories.find((item) => item.nombre_categoria === movimiento.categoria);
     setFormDataEdicion({
-      monto: String(movimiento.monto),
+      monto: String(Math.trunc(Number(movimiento.monto) || 0)),
       descripcion: movimiento.descripcion,
       id_categoria: categoria ? String(categoria.id_categoria) : '',
       fecha: movimiento.fecha,
@@ -340,10 +340,23 @@ export default function SinglePageApp() {
     label: `${monthNames[i]} ${currentYear}`,
   }));
 
-  const baseMensual = Math.min(Number(data.summary.ingresos_mes), Number(data.summary.balance_total));
-  const totalToDistribute = manualSavingsAmount
-    ? Number(manualSavingsAmount)
-    : (baseMensual * savingsPercentage) / 100;
+  const balanceDisponible = Math.max(0, Number(data.summary.balance_total) || 0);
+  const ingresosDelMes = Math.max(0, Number(data.summary.ingresos_mes) || 0);
+  const baseMensual = Math.min(ingresosDelMes, balanceDisponible);
+  const manualAmount = parseAmountForBackend(manualSavingsAmount);
+  const totalToDistribute = Math.min(
+    balanceDisponible,
+    manualAmount > 0 ? manualAmount : (baseMensual * savingsPercentage) / 100,
+  );
+
+  const projectedAllocations = new Map(
+    calculateSavingsDistribution(
+      totalToDistribute,
+      data.metas,
+      savingsDistributionMode,
+      selectedGoalIds,
+    ).map((allocation) => [allocation.id_meta, allocation.monto]),
+  );
 
   return (
     <div className="min-h-screen bg-[#090d16] text-white flex font-sans">
@@ -593,13 +606,7 @@ export default function SinglePageApp() {
                 </div>
               ) : (
                 data.metas.map((meta) => {
-                  const projectedAmount = getProjectedForMeta(
-                    meta,
-                    data.metas,
-                    totalToDistribute,
-                    savingsDistributionMode,
-                    selectedGoalIds,
-                  );
+                  const projectedAmount = projectedAllocations.get(Number(meta.id)) ?? 0;
                   return (
                     <motion.div
                       key={meta.id}
